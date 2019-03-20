@@ -9,5 +9,4 @@ install:
   - pip install -r requirements/dev.txt
   - pip install -e .
 script:
-  - python -c "from fpe.functions import id_;print(id_('AAAAAAAAAA'))"
   - pytest -v --hypothesis-show-statistics
