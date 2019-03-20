@@ -9,6 +9,6 @@ install:
   - pip install -r requirements/dev.txt
   - pip install -e .
 script:
-  - pytest -v --hypothesis-show-statistics --cov=fpelements
+  - pytest -v --hypothesis-show-statistics --cov=fpe
 after_success:
   — coveralls
