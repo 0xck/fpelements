@@ -6,7 +6,8 @@ PACKAGE = "fpe"
 setup(
     name=PACKAGE,
     version=__import__(PACKAGE).__version__,
-    packages=find_packages(exclude=["tests.*", "tests", "*.md"]),
+    packages=find_packages(
+        exclude=["tests.*", "tests", "*.md", "requirements"]),
     description="Functional programming tools",
     long_description=open("README.txt").read(),
     test_suite="tests",
