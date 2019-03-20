@@ -129,7 +129,7 @@ class TestCurrying(TestCase):
 
         for kw in kwgs:
             self.assertEqual(c.func(**kw), result)
-    
+
     def test_curring_errors(self):
 
         with self.assertRaises(AssertionError):
