@@ -35,7 +35,7 @@ def _get_defaults(func: Callable) -> Tuple[Any, ...]:
     """
     getting function defaults
 
-    Similar func.__defaults__
+    Similar to func.__defaults__
     """
 
     # only callable
@@ -53,7 +53,7 @@ def _is_defaults(func: Callable) -> bool:
     """
     checking if funciton has default arguments
 
-    Similar bool(func.__defaults__)
+    Similar to bool(func.__defaults__)
     """
 
     # only callable
@@ -71,7 +71,7 @@ def _get_arg_count(func: Callable) -> int:
     """
     getting number of function arguments
 
-    Similar func.__code__.co_argcount
+    Similar to func.__code__.co_argcount
     """
     # only callable
     assert callable(func), AssertNotCallable()
@@ -112,6 +112,9 @@ def is_curried(func: Callable) -> bool:
 
 
 class Function(metaclass=ABCMeta):
+    """
+    Abstract class for representation advanced function features
+    """
 
     @property
     @abstractmethod
@@ -239,6 +242,10 @@ class Function(metaclass=ABCMeta):
 class CurriedFunctionPositionals(Function):
     """
     Curring function with positional only arguments representation class
+
+    Similar to
+        func = CurriedFunctionPositionals(f)
+        func(x)(y, z) == func(x, y)(z) == f(x, y, z)
     """
 
     def __init__(self, func: Callable):
@@ -293,6 +300,10 @@ class CurriedFunctionPositionals(Function):
 class CurriedFunctionDefaults(Function):
     """
     Curring function with defaults arguments representation class
+
+    Similar to:
+        func = CurriedFunctionDefaults(f)
+        func(x)(y=5, z=10) == func(x, y=5) == f(x, y=5, z=10) == func(x, y=5)
     """
 
     def __init__(self, func: Callable):
@@ -390,6 +401,10 @@ class CurriedFunctionDefaults(Function):
 class CurriedBuiltinFunctionFixedArguments(Function):
     """
     Curring function with builins with fixed number of positionals
+
+    Similar to
+        func = CurriedBuiltinFunctionFixedArguments(3, f)
+        func(x)(y, z) == func(x, y)(z) == f(x, y, z)
     """
 
     def __init__(self, num: int, func: Callable):
@@ -436,6 +451,8 @@ class CurriedBuiltinFunctionFixedArguments(Function):
 class FunctionComposition(Function):
     """
     Function composition representation class
+
+    Similar to FunctionComposition(f, g)(x) == g(f(x))
 
     Borrowed from (.) :: (b -> c) -> (a -> b) -> a -> c
 
@@ -484,6 +501,8 @@ class _idFunction(Function):
     """
     Class for representation id function
 
+    id functions returns given value
+
     Borrowed from id :: a -> a
     """
 
@@ -503,9 +522,17 @@ class _idFunction(Function):
         return value
 
 
+# id function
+id_ = _idFunction()
+
+
 def _curry_common(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunctionPositionals]:
     """
-    curring function for functions with at least 2 positional and keyword arguments
+    Curring function for functions with at least 2 positional and keyword arguments
+
+    Similar to:
+        for positionals: curry(f)(x)(y, z) == curry(f)(x, y)(z) == f(x, y, z)
+        for defaults: curry(f)(x)(y=5, z=10) == curry(f)(x, y=5) == f(x, y=5, z=10)
     """
 
     # only callable
@@ -544,7 +571,9 @@ def _curry_common(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunct
 @_curry_common
 def _curry_buitin_fixed(num: int, func: Callable) -> CurriedBuiltinFunctionFixedArguments:
     """
-    curring function for builtin functions with at least 2 positional arguments
+    Curring function for builtin functions with at least 2 positional arguments
+
+    Similar to curry(3)(f)(x)(y, z) == curry(3)(f)(x, y)(z) == f(x, y, z)
     """
 
     # only int
@@ -572,7 +601,12 @@ def curry(func_or_num: Union[int, Callable]) -> Union[
                                                     CurriedFunctionPositionals,
                                                     CurriedBuiltinFunctionFixedArguments]:
     """
-    curring function for functions with at least 2 arguments
+    Curring function for functions with at least 2 arguments
+
+    Similar to:
+        for positionals: curry(f)(x)(y, z) == curry(f)(x, y)(z) == f(x, y, z)
+        for defaults: curry(f)(x)(y=5, z=10) == curry(f)(x, y=5) == f(x, y=5, z=10)
+        for builtins: curry(3)(f)(x)(y, z) == curry(3)(f)(x, y)(z) == f(x, y, z)
     """
 
     # only callable
@@ -588,14 +622,23 @@ def curry(func_or_num: Union[int, Callable]) -> Union[
 
 @curry
 def compose(func1: Callable, func2: Callable) -> FunctionComposition:
-    # wrapper on Function_compose for getting any 2 functions composed
+    """
+    Wrapper on Function._compose for getting any 2 functions composed
 
+    Similar to compose(f, g)(x) == g(f(x))
+    """
     return Function._compose(func1, func2)
 
 
 def flip(func: Callable) -> Callable:
-    
-    
+    """
+    Decorator swaps arguments provided to decoreted function
+
+    Similar to flip(f)(x, y) == f(y, x)
+
+    Borrowed from flip :: (a -> b -> c) -> b -> a -> c
+    """
+
     # only callable
     assert callable(func), AssertNotCallable()
 
@@ -604,6 +647,3 @@ def flip(func: Callable) -> Callable:
     
     return flipped
 
-
-# id function
-id_ = _idFunction()
