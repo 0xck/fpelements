@@ -1,0 +1,11 @@
+language: python
+os: linux
+dist: xenial
+python: 
+  - "3.6"
+sudo: required
+install:
+  - pip install -r requirements/dev.txt
+  - pip install -e .
+script:
+  - pytest
