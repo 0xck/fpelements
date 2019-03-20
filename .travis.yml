@@ -11,4 +11,4 @@ install:
 script:
   - pytest -v --hypothesis-show-statistics --cov=fpe
 after_success:
-  — coveralls
+  - coveralls
