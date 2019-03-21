@@ -147,7 +147,7 @@ class Function(metaclass=ABCMeta):
         """
         General composition method: (f, g) = g(f)
 
-        It takes 2 functions and return their composition where func1 execures before func2.
+        It takes 2 functions and return their composition where func1 executes before func2.
         Composition works on all callable objects, but it consider them as one-argument function,
         and if there are more arguments, then
             if function is curried and waits for one argument, then it executes regular way
@@ -243,7 +243,7 @@ class CurriedFunctionPositionals(Function):
     """
     Curring function with positional only arguments representation class
 
-    Similar to
+    Thus
         func = CurriedFunctionPositionals(f)
         func(x)(y, z) == func(x, y)(z) == f(x, y, z)
     """
@@ -301,7 +301,7 @@ class CurriedFunctionDefaults(Function):
     """
     Curring function with defaults arguments representation class
 
-    Similar to:
+    Thus
         func = CurriedFunctionDefaults(f)
         func(x)(y=5, z=10) == func(x, y=5) == f(x, y=5, z=10) == func(x, y=5)
     """
@@ -402,7 +402,7 @@ class CurriedBuiltinFunctionFixedArguments(Function):
     """
     Curring function with builins with fixed number of positionals
 
-    Similar to
+    Thus
         func = CurriedBuiltinFunctionFixedArguments(3, f)
         func(x)(y, z) == func(x, y)(z) == f(x, y, z)
     """
@@ -530,7 +530,7 @@ def _curry_common(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunct
     """
     Curring function for functions with at least 2 positional and keyword arguments
 
-    Similar to:
+    Thus:
         for positionals: curry(f)(x)(y, z) == curry(f)(x, y)(z) == f(x, y, z)
         for defaults: curry(f)(x)(y=5, z=10) == curry(f)(x, y=5) == f(x, y=5, z=10)
     """
@@ -573,7 +573,7 @@ def _curry_buitin_fixed(num: int, func: Callable) -> CurriedBuiltinFunctionFixed
     """
     Curring function for builtin functions with at least 2 positional arguments
 
-    Similar to curry(3)(f)(x)(y, z) == curry(3)(f)(x, y)(z) == f(x, y, z)
+    Thus curry(3)(f)(x)(y, z) == curry(3)(f)(x, y)(z) == f(x, y, z)
     """
 
     # only int
@@ -603,7 +603,7 @@ def curry(func_or_num: Union[int, Callable]) -> Union[
     """
     Curring function for functions with at least 2 arguments
 
-    Similar to:
+    Thus:
         for positionals: curry(f)(x)(y, z) == curry(f)(x, y)(z) == f(x, y, z)
         for defaults: curry(f)(x)(y=5, z=10) == curry(f)(x, y=5) == f(x, y=5, z=10)
         for builtins: curry(3)(f)(x)(y, z) == curry(3)(f)(x, y)(z) == f(x, y, z)
@@ -625,7 +625,7 @@ def compose(func1: Callable, func2: Callable) -> FunctionComposition:
     """
     Wrapper on Function._compose for getting any 2 functions composed
 
-    Similar to compose(f, g)(x) == g(f(x))
+    Thus compose(f, g)(x) == g(f(x))
     """
     return Function._compose(func1, func2)
 
@@ -634,7 +634,7 @@ def flip(func: Callable) -> Callable:
     """
     Decorator swaps arguments provided to decoreted function
 
-    Similar to flip(f)(x, y) == f(y, x)
+    Thus flip(f)(x, y) == f(y, x)
 
     Borrowed from flip :: (a -> b -> c) -> b -> a -> c
     """
@@ -642,8 +642,21 @@ def flip(func: Callable) -> Callable:
     # only callable
     assert callable(func), AssertNotCallable()
 
-    def flipped(x: Any, y: Any) -> Any:
-        return func(y, x)
+    def flipped(first: Any, second: Any) -> Any:
+        return func(second, first)
     
     return flipped
 
+
+@curry
+def ite(predicate: Callable, alternative: Any, value: Any) -> Any:
+    """
+    Ternary predicate function: if then else
+
+    Same as value if predicate(value) else alternative
+    """
+
+    # only callable
+    assert callable(predicate), AssertNotCallable()
+
+    return value if predicate(value) else alternative
