@@ -1,10 +1,12 @@
+import inspect
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
 from functools import reduce
-import inspect
-from typing import Callable, Tuple, Any, Union, Dict
-from fpe.asserts import AssertNotCallable, AssertCurringError, AssertFunctionWrappingError, AssertWrongArgumentType, AssertFunctionCompositionError, AssertWrongType
+from typing import Any, Callable, Dict, Tuple, Union
 
+from fpe.asserts import (AssertCurringError, AssertFunctionCompositionError,
+                         AssertFunctionWrappingError, AssertNotCallable,
+                         AssertWrongArgumentType, AssertWrongType)
 
 # inspect.isbuiltin does not work for all built-ins
 # see https://bugs.python.org/issue23525
@@ -156,7 +158,7 @@ class Function(metaclass=ABCMeta):
         """
 
         # only callable
-        assert all((callable(func1), callable(func2))), AssertNotCallable()
+        assert callable(func1) and callable(func2), AssertNotCallable()
 
         composed = FunctionComposition(func1, func2)
 
@@ -468,7 +470,7 @@ class FunctionComposition(Function):
     def __init__(self, func1: Callable, func2: Callable):
 
         # only callable
-        assert all((callable(func1), callable(func2))), AssertNotCallable()
+        assert callable(func1) and callable(func2), AssertNotCallable()
 
         self._func: Tuple[Callable, ...] = _func_to_tuple(func1) + _func_to_tuple(func2)
 
@@ -621,42 +623,24 @@ def curry(func_or_num: Union[int, Callable]) -> Union[
 
 
 @curry
-def compose(func1: Callable, func2: Callable) -> FunctionComposition:
+def compose(func2: Callable, func1: Callable) -> FunctionComposition:
     """
-    Wrapper on Function._compose for getting any 2 functions composed
+    Wrapper on Function._compose for getting any 2 functions composed in math-style
 
-    Thus compose(f, g)(x) == g(f(x))
+    It takes 2 functions and return their composition where func1 executes before func2.
+    This is math-style composition, so second given function will be executed first.
+    Thus compose(g, f)(x) == g(f(x))
     """
     return Function._compose(func1, func2)
 
 
-def flip(func: Callable) -> Callable:
-    """
-    Decorator swaps arguments provided to decoreted function
-
-    Thus flip(f)(x, y) == f(y, x)
-
-    Borrowed from flip :: (a -> b -> c) -> b -> a -> c
-    """
-
-    # only callable
-    assert callable(func), AssertNotCallable()
-
-    def flipped(first: Any, second: Any) -> Any:
-        return func(second, first)
-    
-    return flipped
-
-
 @curry
-def ite(predicate: Callable, alternative: Any, value: Any) -> Any:
+def pipe(func1: Callable, func2: Callable) -> FunctionComposition:
     """
-    Ternary predicate function: if then else
+    Wrapper on Function._compose for getting any 2 functions composed in pipe-style
 
-    Same as value if predicate(value) else alternative
+    It takes 2 functions and return their composition where func1 executes before func2.
+    This is pipe-style composition, so first given function will be executed first.
+    Thus compose(f, g)(x) == g(f(x))
     """
-
-    # only callable
-    assert callable(predicate), AssertNotCallable()
-
-    return value if predicate(value) else alternative
+    return Function._compose(func1, func2)
