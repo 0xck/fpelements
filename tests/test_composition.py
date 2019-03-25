@@ -1,53 +1,13 @@
 from sys import maxsize
 from unittest import TestCase, main
-from hypothesis import given
+
 import hypothesis.strategies as st
-from fpe.functions import curry, id_, compose, FunctionComposition
+from hypothesis import given
 
+from fpe.functions import FunctionComposition, compose, id_, pipe
 
-@curry
-def mul(x, y):
-    return x * y
-
-
-@curry
-def plus(x, y):
-    return x + y
-
-
-@curry
-def minus(x, y):
-    return y - x
-
-
-def to_str(x):
-    return str(x)
-
-
-def to_int(x):
-    return int(x)
-
-
-def negate(x):
-    return -(x)
-
-
-def mul_(x, y):
-    return x * y
-
-
-def plus_(x, y):
-    return x + y
-
-
-def minus_(x, y):
-    return y - x
-
-
-numbers = st.floats(allow_nan=False, allow_infinity=False) | st.integers()
-non_seq = st.none() | st.booleans() | st.text() | numbers
-seq = st.lists(non_seq) | st.tuples(non_seq)
-random_types = non_seq | seq | st.dictionaries(st.text() | st.integers(), non_seq | seq)
+from .stuff import (minus, minus_, mul, negate, plus, plus_, random_types,
+                    to_int, to_str)
 
 
 class TestComposition(TestCase):
@@ -63,8 +23,11 @@ class TestComposition(TestCase):
         p_composed = (plus(x) | minus(x) | mul(x))
         self.assertEqual(p_composed(y), result)
 
-        f_composed = compose(plus(x), minus(x)) | mul(x)
-        self.assertEqual(f_composed(y), result)
+        fm_composed = compose(minus(x), plus(x)) | mul(x)
+        self.assertEqual(fm_composed(y), result)
+
+        fp_composed = pipe(plus(x), minus(x)) | mul(x)
+        self.assertEqual(fp_composed(y), result)
 
     @given(st.integers(), st.integers())
     def test_composition_associativity(self, x, y):
@@ -77,9 +40,13 @@ class TestComposition(TestCase):
         p_composed2 = (plus(x) | minus(x)) | mul(x)
         self.assertEqual(p_composed1(y), p_composed2(y))
 
-        f_composed1 = compose(plus(x), compose(minus(x), mul(x)))
-        f_composed2 = compose(compose(plus(x), minus(x)), mul(x))
-        self.assertEqual(f_composed1(y), f_composed2(y))
+        fm_composed1 = compose(compose(mul(x), minus(x)), plus(x))
+        fm_composed2 = compose(mul(x), compose(minus(x), plus(x)))
+        self.assertEqual(fm_composed1(y), fm_composed2(y))
+
+        fp_composed1 = compose(plus(x), compose(minus(x), mul(x)))
+        fp_composed2 = compose(compose(plus(x), minus(x)), mul(x))
+        self.assertEqual(fp_composed1(y), fp_composed2(y))
 
     @given(st.integers(), st.integers())
     def test_composition_identity(self, x, y):
@@ -92,6 +59,8 @@ class TestComposition(TestCase):
         self.assertEqual((id_ | minus(x))(y), result)
         self.assertEqual(compose(minus(x), id_)(y), result)
         self.assertEqual(compose(id_, minus(x))(y), result)
+        self.assertEqual(pipe(minus(x), id_)(y), result)
+        self.assertEqual(pipe(id_, minus(x))(y), result)
 
     @given(st.integers(), st.from_regex(r"(-)?\d{1,15}" if maxsize > 2 ** 32 else r"(-)?\d{1,7}", fullmatch=True))
     def test_composition_foreign(self, x, s):
@@ -102,34 +71,32 @@ class TestComposition(TestCase):
         for f in funcs_num:
             result = f(x)
 
-            m_composed_l = (id_ * f)
-            m_composed_r = (f * id_)
-            self.assertEqual(m_composed_l(x), result)
-            self.assertEqual(m_composed_r(x), result)
+            self.assertEqual((id_ * f)(x), result)
+            self.assertEqual((f * id_)(x), result)
 
-            p_composed_l = (id_ | f)
-            p_composed_r = (f | id_)
-            self.assertEqual(p_composed_l(x), result)
-            self.assertEqual(p_composed_r(x), result)
+            self.assertEqual((id_ | f)(x), result)
+            self.assertEqual((f | id_)(x), result)
 
             self.assertEqual(compose(f, id_)(x), result)
             self.assertEqual(compose(id_, f)(x), result)
 
+            self.assertEqual(pipe(f, id_)(x), result)
+            self.assertEqual(pipe(id_, f)(x), result)
+
         for f in funcs_str:
             result = f(s)
 
-            m_composed_l = (id_ * f)
-            m_composed_r = (f * id_)
-            self.assertEqual(m_composed_l(s), result)
-            self.assertEqual(m_composed_r(s), result)
+            self.assertEqual((id_ * f)(s), result)
+            self.assertEqual((f * id_)(s), result)
 
-            p_composed_l = (id_ | f)
-            p_composed_r = (f | id_)
-            self.assertEqual(p_composed_l(s), result)
-            self.assertEqual(p_composed_r(s), result)
+            self.assertEqual((id_ | f)(s), result)
+            self.assertEqual((f | id_)(s), result)
 
             self.assertEqual(compose(f, id_)(s), result)
             self.assertEqual(compose(id_, f)(s), result)
+
+            self.assertEqual(pipe(f, id_)(s), result)
+            self.assertEqual(pipe(id_, f)(s), result)
 
     def test_composition_class(self):
 
@@ -160,6 +127,15 @@ class TestComposition(TestCase):
         self.assertIsInstance(compose(plus_, id_), FunctionComposition)
         self.assertIsInstance(compose(id_, id_), FunctionComposition)
 
+        self.assertIsInstance(pipe(plus, minus), FunctionComposition)
+        self.assertIsInstance(pipe(plus, minus_), FunctionComposition)
+        self.assertIsInstance(pipe(plus_, minus), FunctionComposition)
+        self.assertIsInstance(pipe(id_, minus), FunctionComposition)
+        self.assertIsInstance(pipe(plus, id_), FunctionComposition)
+        self.assertIsInstance(pipe(id_, minus_), FunctionComposition)
+        self.assertIsInstance(pipe(plus_, id_), FunctionComposition)
+        self.assertIsInstance(pipe(id_, id_), FunctionComposition)
+
     @given(random_types, random_types)
     def test_composition_class_negative(self, f1, f2):
 
@@ -169,11 +145,6 @@ class TestComposition(TestCase):
         self.assertRaises(AssertionError, FunctionComposition, f1, plus_)
         self.assertRaises(AssertionError, FunctionComposition, plus, f2)
         self.assertRaises(AssertionError, FunctionComposition, plus_, f2)
-
-    @given(random_types)
-    def test_id(self, x):
-
-        self.assertEqual(id_(x), x)
 
 
 if __name__ == '__main__':

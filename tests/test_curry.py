@@ -1,31 +1,14 @@
-# import sys
 from itertools import permutations
 from unittest import TestCase, main
-import operator
-from hypothesis import given
+
 import hypothesis.strategies as st
-from fpe.functions import curry, _unknown_builtin, CurriedFunctionDefaults, CurriedFunctionPositionals, CurriedBuiltinFunctionFixedArguments
+from hypothesis import given
 
+from fpe.functions import (CurriedBuiltinFunctionFixedArguments,
+                           CurriedFunctionDefaults, CurriedFunctionPositionals,
+                           curry)
 
-builtins = (
-    abs, min, setattr, all, dir, hex, next, any, divmod, id, sorted, ascii,
-    input, oct, bin, eval, open, exec, isinstance, ord, sum, issubclass, pow,
-    iter, print, callable, format, len, chr, vars, getattr, locals, repr, compile,
-    globals, hasattr, max, round, delattr, hash)
-
-bin_op_cmp = (operator.lt, operator.le, operator.eq, operator.ne, operator.ge, operator.gt)
-
-bin_op_math = (operator.add, operator.floordiv, operator.truediv,
-               operator.sub, operator.mul, operator.mod, operator.pow)
-
-bin_op_log = (operator.and_, operator.or_, operator.xor)
-
-bin_op_bin = (operator.rshift, operator.lshift)
-
-seq_op = (operator.concat, operator.contains,
-          operator.delitem, operator.getitem, operator.setitem)
-
-known_builtins = builtins + _unknown_builtin + bin_op_cmp + bin_op_math + bin_op_log + bin_op_bin + seq_op
+from .stuff import bin_op_cmp, bin_op_log, bin_op_math, known_builtins
 
 
 def func_pos(x, y):
@@ -191,7 +174,7 @@ class TestCurrying(TestCase):
     def test_currying_builtin_cmp_log(self, x, y):
 
         for f in bin_op_cmp+bin_op_log:
-            
+
             cf = curry(2)(f)
             result = f(x, y)
 
@@ -202,7 +185,7 @@ class TestCurrying(TestCase):
     def test_currying_builtin_math(self, x, y):
 
         for f in bin_op_math[:-1]:
-            
+
             cf = curry(2)(f)
             result = f(x, y)
 
