@@ -91,6 +91,7 @@ class Right(Either):
         return Right(func(self._value))
 
     def __mod__(self, either: Eithers) -> Eithers:
+
         # only callable
         assert callable(self._value), AssertNotCallable()
         # only Either
@@ -100,6 +101,7 @@ class Right(Either):
 
     def __rshift__(self, func: Callable[..., Eithers]) -> Eithers:
 
+        # only callable
         assert callable(func), AssertNotCallable()
 
         return func(self._value)

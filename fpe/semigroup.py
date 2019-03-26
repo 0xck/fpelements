@@ -13,7 +13,7 @@ class AbstractSemigroup(metaclass=ABCMeta):
             `&` must satisfy the associative law:
                 (x <> y) <> z == x <> (y <> z)
 
-            This is not possible to satisfy this law in some automatical way,
+            This is not possible to satisfy this law in some automatically way,
             implementation should be performed manually.
         """
         pass

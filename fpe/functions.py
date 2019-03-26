@@ -8,6 +8,7 @@ from fpe.asserts import (AssertCurringError, AssertFunctionCompositionError,
                          AssertFunctionWrappingError, AssertNotCallable,
                          AssertWrongArgumentType, AssertWrongType)
 
+
 # inspect.isbuiltin does not work for all built-ins
 # see https://bugs.python.org/issue23525
 _unknown_builtin = (dict, help, slice, object, enumerate, staticmethod, int, str,
@@ -53,7 +54,7 @@ def _get_defaults(func: Callable) -> Tuple[Any, ...]:
 
 def _is_defaults(func: Callable) -> bool:
     """
-    checking if funciton has default arguments
+    checking if function has default arguments
 
     Similar to bool(func.__defaults__)
     """
@@ -154,7 +155,7 @@ class Function(metaclass=ABCMeta):
         and if there are more arguments, then
             if function is curried and waits for one argument, then it executes regular way
             if function is curried and waits for more than one argument, then it retracted given argument and returns curried function
-            otherwise TypeError is rised: 'func expected N arguments, got 1'
+            otherwise TypeError is raised: 'func expected N arguments, got 1'
         """
 
         # only callable
@@ -387,7 +388,7 @@ class CurriedFunctionDefaults(Function):
 
             return self._func(*(self._args + args), **defaults)
 
-        # if enought or more positionals and keyword arguments
+        # if enough or more positionals and keyword arguments
         # let python handles the error itself when extra arguments exist
         if (num_args + len(kw)) >= self._original_arg_count:
             return self._func(*(self._args + args), **kw)
@@ -402,7 +403,7 @@ class CurriedFunctionDefaults(Function):
 
 class CurriedBuiltinFunctionFixedArguments(Function):
     """
-    Curring function with builins with fixed number of positionals
+    Curring function with builtins with fixed number of positionals
 
     Thus
         func = CurriedBuiltinFunctionFixedArguments(3, f)
@@ -571,7 +572,7 @@ def _curry_common(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunct
 
 
 @_curry_common
-def _curry_buitin_fixed(num: int, func: Callable) -> CurriedBuiltinFunctionFixedArguments:
+def _curry_builtin_fixed(num: int, func: Callable) -> CurriedBuiltinFunctionFixedArguments:
     """
     Curring function for builtin functions with at least 2 positional arguments
 
@@ -617,7 +618,7 @@ def curry(func_or_num: Union[int, Callable]) -> Union[
             "curry decorator passes only callable or number of fixed arguments for built-ins")
 
     if isinstance(func_or_num, int):
-        return _curry_buitin_fixed(func_or_num)
+        return _curry_builtin_fixed(func_or_num)
 
     return _curry_common(func_or_num)
 

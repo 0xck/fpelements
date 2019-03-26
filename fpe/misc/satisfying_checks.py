@@ -71,7 +71,7 @@ def applicative_simple_satisfy_check(instance_value: AbstractApplicative,
                                     instance_func2: AbstractApplicative,
                                     func: Callable, value: Any) -> bool:
     """
-    Very simple `%` (applicatinve operation) satisfy checker
+    Very simple `%` (applicative operation) satisfy checker
 
     Function provides very generic checking for following laws:
         pure id <*> v = v

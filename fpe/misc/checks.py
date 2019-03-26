@@ -7,7 +7,7 @@ from fpe.asserts import (AssertEmptyValue, AssertWrongArgumentType,
 
 def get_parent_by_attr(mro: Sequence, attr: str, default=None):
     """
-    Searching for right parent by class which is attribue base endpoint.
+    Searching for right parent by class which is attribute base endpoint.
 
     E.g.
         An attribute `attr` is defined in class X and X is parent for A and B,
@@ -22,7 +22,7 @@ def get_parent_by_attr(mro: Sequence, attr: str, default=None):
         if attribute is defined attribute magic methods, then
         current item has the attribute and:
             there is not parent for current item (last item) or
-            parent for current item does not have this attribue
+            parent for current item does not have this attribute
     """
     # mro is sequence
     assert isinstance(mro, Sequence), AssertWrongArgumentType("Sequence")

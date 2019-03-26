@@ -12,7 +12,7 @@ class AbstractApplicative(AbstractFunctor):
         """
         Lift a value function.
 
-        Borrorwed from pure :: a -> f a
+        Borrowed from pure :: a -> f a
         """
         pass
 
@@ -31,7 +31,7 @@ class AbstractApplicative(AbstractFunctor):
                 homomorphism: pure f <*> pure x = pure (f x)
                 interchange: u <*> pure y = pure ($ y) <*> u
 
-            This is not possible to satisfy these laws in some automatical way,
+            This is not possible to satisfy these laws in some automatically way,
             implementation should be performed manually.
         """
         pass
