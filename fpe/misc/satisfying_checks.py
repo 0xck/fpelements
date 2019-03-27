@@ -89,10 +89,13 @@ def applicative_simple_satisfy_check(instance_value: AbstractApplicative,
     # only Applicative
     assert all(isinstance(i, AbstractApplicative) for i in (
         instance_value, instance_func1, instance_func2)), AssertWrongArgumentType("AbstractApplicative")
-    # the same instance
-    # assert items_has_same_parent_by_method(
-    #     "__pow__", (instance_value, instance_func1, instance_func2)), AssertWrongArgumentType(
-    #         "the same class as other arguments have")
+    # every item has to have same class or common parent that is an AbstractApplicative
+    assert all(
+                any(
+                    issubclass(j, AbstractApplicative) for j in get_common_parents(instance_value, i)
+                ) for i in (instance_func1, instance_func2)
+        ), AssertWrongArgumentType(
+            "{} for every argument and has common parent with other".format("AbstractApplicative"))
 
     cls = type(instance_value)
 
