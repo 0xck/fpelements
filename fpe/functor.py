@@ -19,7 +19,7 @@ class AbstractFunctor(metaclass=ABCMeta):
                 fmap id  ==  id
                 fmap (f . g)  ==  fmap f . fmap g
 
-            This is not possible to satisfy these laws in some automatical way,
+            This is not possible to satisfy these laws in some automatically way,
             implementation should be performed manually.
         """
         pass
