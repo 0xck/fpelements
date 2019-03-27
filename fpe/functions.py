@@ -241,6 +241,11 @@ class Function(metaclass=ABCMeta):
         self.__module__ = getattr(self._func, "__module__", defaults[2])
         self.__qualname__ = getattr(self._func, "__qualname__", defaults[3])
 
+    def __repr__(self):
+
+        return "{}, retracted: function <{}>, number of arguments <{}>".format(
+            self.__class__.__name__, self._func, self.retracted)
+
 
 class CurriedFunctionPositionals(Function):
     """
@@ -256,9 +261,7 @@ class CurriedFunctionPositionals(Function):
         # only callable
         assert callable(func), AssertNotCallable()
         # only non builtin
-        assert func not in _unknown_builtin, AssertCurringError(
-            "builtin functions or methods are not supported")
-        assert not inspect.isbuiltin(func), AssertCurringError(
+        assert (func not in _unknown_builtin) and (not inspect.isbuiltin(func)), AssertCurringError(
             "builtin functions or methods are not supported")
         # func with variable arguments
         assert not _is_variable(func), AssertFunctionWrappingError(
@@ -314,9 +317,7 @@ class CurriedFunctionDefaults(Function):
         # only callable
         assert callable(func), AssertNotCallable()
         # only non builtin
-        assert func not in _unknown_builtin, AssertCurringError(
-            "builtin functions or methods are not supported")
-        assert not inspect.isbuiltin(func), AssertCurringError(
+        assert (func not in _unknown_builtin) and (not inspect.isbuiltin(func)), AssertCurringError(
             "builtin functions or methods are not supported")
         # func with variable arguments
         assert not _is_variable(func), AssertFunctionWrappingError(
@@ -401,25 +402,63 @@ class CurriedFunctionDefaults(Function):
         return curried
 
 
-class CurriedBuiltinFunctionFixedArguments(Function):
+class CurriedFunctionFixedArgumentsNumber(Function):
     """
-    Curring function with builtins with fixed number of positionals
+    Curring function by using fixed number of positionals representation class
 
     Thus
-        func = CurriedBuiltinFunctionFixedArguments(3, f)
+        func = CurriedFunctionFixedArgumentsNumber(3, f)
         func(x)(y, z) == func(x, y)(z) == f(x, y, z)
+
+    Warning.
+        This approach changed obvious function behavior and may lead to tricky
+        and hidden errors, that are hard to troubleshooting.
+        Before using make sure you understand principles of its working.
+
+    This works only if enough number of positional arguments are provided.
+    Keyword arguments are not handled until that. Check following
+    examples, for better understanding:
+
+        f = curry(3)func(a, b, x=0); f(1, 2) #  will not work, due lack of positionals
+        f = curry(3)func(a, b, x=0); f(1, 2, x=10) #  will not work, due lack of positionals
+        f = curry(3)func(a, b, x=0); f(1, 2, 10) #  will work
+        f = curry(2)func(a, b, c, x=0); f(1)(2, 3) #  will not work, due wrong number of fixed
+        f = curry(3)func(a, b, c, x=0); f(1, 2)(3) #  will work
+        f = curry(3)func(a, b, c, x=0); f(1)(2, 3, x=10) #  will work
+        f = curry(3)func(a, b, c, x=0); f(1, 2)(3, 10) #  will work
+        f = curry(3)func(a, b, c, x=0, y=1); f(1, 2)(3, 10) #  will work
+        f = curry(3)func(a, b, c, x=0, y=1); f(1, 2)(3, 10)(11) #  will work
+        f = curry(3)func(x=0, y=1, z=2); f() #  will not work, due lack of positionals
+        f = curry(3)func(x=0, y=1, z=2); f(1, 2) #  will not work, due lack of positionals
+        f = curry(3)func(x=0, y=1, z=2); f(1, 2, 3) #  will work
+        f = curry(3)func(*args); f(1, 2, 3) #  will work
+        f = curry(3)func(*args); f(1, 2) #  will not work, due lack of positionals
+        f = curry(3)func(a, *args); f(1, 2, 3) #  will work
+        f = curry(3)func(a, b, *args); f(1, 2, 3) #  will work
+        f = curry(3)func(a, b, *args); f(1, 2)(3, 4)(5) #  will work
+        f = curry(3)func(a, b, *args, x=0); f(1)(2, 3, x=10) #  will work
+        f = curry(2)func(a, *args, x=0); f(1, x=10) #  will not work, due lack of positionals
     """
 
     def __init__(self, num: int, func: Callable):
 
         # only callable
         assert callable(func), AssertNotCallable()
-        # only builtin
-        assert inspect.isbuiltin(func) or func in _unknown_builtin, AssertFunctionWrappingError(
-            "non-built-in functions or methods are not supported for manually defined arguments number")
         # wrong arguments number
         assert num > 1, AssertFunctionWrappingError(
             "number of arguments has to be at least 2")
+        # function is not builtin, does not have variables and
+        # number of fixed is wrong from number of arguments,
+        # that can be provided
+        assert not (
+            # function is not builtin
+            ((func not in _unknown_builtin) and (not inspect.isbuiltin(func))) and \
+            # function does not have variables
+            (not _is_variable(func)) and \
+            # too less number (never executed) of arguments or too much (executes with TypeError)
+            ((_get_arg_count(func) < num) or (_get_arg_count(func) - len(_get_defaults(func)) > num))
+        ), AssertFunctionWrappingError(
+            "wrong number of fixed arguments: too less or too much fixed arguments for given function")
 
         self._func: Callable = func
         self._args: Tuple[Any, ...] = tuple()
@@ -449,6 +488,9 @@ class CurriedBuiltinFunctionFixedArguments(Function):
         curried._args = (self._args + args)[:]
 
         return curried
+
+    def __repr__(self):
+        return super().__repr__() + ", number of fixed <{}>".format(self._original_arg_count)
 
 
 class FunctionComposition(Function):
@@ -499,6 +541,10 @@ class FunctionComposition(Function):
 
         return result
 
+        def __repr__(self):
+
+            return "{}, retracted: functions <{}>".format(self.__class__.__name__, self._func)
+
 
 class _idFunction(Function):
     """
@@ -524,6 +570,9 @@ class _idFunction(Function):
     def __call__(self, value: Any) -> Any:
         return value
 
+    def __repr__(self):
+        return "id"
+
 
 # id function
 id_ = _idFunction()
@@ -541,16 +590,8 @@ def _curry_common(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunct
     # only callable
     assert callable(func), AssertNotCallable()
     # only non builtin
-    assert func not in _unknown_builtin, AssertCurringError(
+    assert (func not in _unknown_builtin) and (not inspect.isbuiltin(func)), AssertCurringError(
         "builtin functions or methods are not supported")
-    assert not inspect.isbuiltin(func), AssertCurringError(
-        "builtin functions or methods are not supported")
-    # func with variable arguments
-    assert not _is_variable(func), AssertCurringError(
-        "functions with variable number of arguments are not supported")
-    # at least 2 args required
-    assert _get_arg_count(func) > 1, AssertCurringError(
-        "functions with less than 2 arguments are not supported")
 
     if _is_defaults(func):
         curried = CurriedFunctionDefaults(func)
@@ -572,53 +613,45 @@ def _curry_common(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunct
 
 
 @_curry_common
-def _curry_builtin_fixed(num: int, func: Callable) -> CurriedBuiltinFunctionFixedArguments:
+def _curry_fixed(num: int, func: Callable) -> CurriedFunctionFixedArgumentsNumber:
     """
-    Curring function for builtin functions with at least 2 positional arguments
+    Curring function for functions with given number of positional arguments
 
     Thus curry(3)(f)(x)(y, z) == curry(3)(f)(x, y)(z) == f(x, y, z)
     """
 
-    # only int
-    assert isinstance(num, int), AssertWrongArgumentType("int")
-    # wrong arguments number
-    assert num > 1, AssertCurringError(
-        "number of arguments has to be at least 2")
-    # only callable
-    assert callable(func), AssertNotCallable()
-    # only builtin
-    assert inspect.isbuiltin(func) or func in _unknown_builtin, AssertCurringError(
-        "non-built-in functions or methods are not supported for manually defined arguments number")
-
-    curried = CurriedBuiltinFunctionFixedArguments(num, func)
+    curried = CurriedFunctionFixedArgumentsNumber(num, func)
 
     # wrong arguments number
     assert 0 <= curried.retracted < num, AssertCurringError(
         "processed function has wrong argument number")
 
+    # wrong func
+    assert func is curried.func, AssertCurringError(
+        "processed function is different from origin")
+
     return curried
 
 
-def curry(func_or_num: Union[int, Callable]) -> Union[
-                                                    CurriedFunctionDefaults,
+def curry(func_or_num: Union[int, Callable]) -> Union[CurriedFunctionDefaults,
                                                     CurriedFunctionPositionals,
-                                                    CurriedBuiltinFunctionFixedArguments]:
+                                                    CurriedFunctionFixedArgumentsNumber]:
     """
-    Curring function for functions with at least 2 arguments
+    Decorator for curring function of at least 2 arguments
 
     Thus:
         for positionals: curry(f)(x)(y, z) == curry(f)(x, y)(z) == f(x, y, z)
         for defaults: curry(f)(x)(y=5, z=10) == curry(f)(x, y=5) == f(x, y=5, z=10)
-        for builtins: curry(3)(f)(x)(y, z) == curry(3)(f)(x, y)(z) == f(x, y, z)
+        for fixed arguments number: curry(3)(f)(x)(y, z) == curry(3)(f)(x, y)(z) == f(x, y, z)
     """
 
     # only callable
     assert callable(func_or_num) or isinstance(
         func_or_num, int), AssertCurringError(
-            "curry decorator passes only callable or number of fixed arguments for built-ins")
+            "curry decorator passes only callable or number of fixed arguments")
 
     if isinstance(func_or_num, int):
-        return _curry_builtin_fixed(func_or_num)
+        return _curry_fixed(func_or_num)
 
     return _curry_common(func_or_num)
 
@@ -642,6 +675,6 @@ def pipe(func1: Callable, func2: Callable) -> FunctionComposition:
 
     It takes 2 functions and return their composition where func1 executes before func2.
     This is pipe-style composition, so first given function will be executed first.
-    Thus compose(f, g)(x) == g(f(x))
+    Thus pipe(f, g)(x) == g(f(x))
     """
     return Function._compose(func1, func2)
