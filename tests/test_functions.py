@@ -1,12 +1,14 @@
 from unittest import TestCase, main
 
 from hypothesis import given
+import hypothesis.strategies as st
 
-from fpe.base import flip
+from fpe.base import flip, odd, even
 from fpe.functions import id_
 from fpe.logic import ite
+from fpe.seqtools import elem
 
-from .stuff import random_types
+from .stuff import random_types, non_seq, collections
 
 
 class TestFunctions(TestCase):
@@ -70,6 +72,18 @@ class TestFunctions(TestCase):
             self.assertIs(depends_on_x(x), x)
         else:
             self.assertIs(depends_on_x(x), y)
+
+    @given(collections, non_seq)
+    def test_elem(self, s, x):
+
+        self.assertEqual(elem(x, s), x in s)
+
+    @given(st.integers())
+    def test_even_odd(self, x):
+
+        self.assertEqual(even(x), not x % 2)
+        self.assertEqual(odd(x), bool(x % 2))
+        self.assertEqual(odd(x), not even(x))
 
 
 if __name__ == '__main__':

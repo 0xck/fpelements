@@ -908,12 +908,6 @@ class TestCurrying(TestCase):
             self.assertRaises(
                 AssertionError, CurriedFunctionFixedArgumentsNumber, y, f)
 
-        assume(x != 2)
-        for f in (minus_, mul_, plus_):
-
-            self.assertRaises(
-                AssertionError, CurriedFunctionFixedArgumentsNumber, x, f)
-
 
 if __name__ == '__main__':
     main()

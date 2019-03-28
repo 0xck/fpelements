@@ -28,7 +28,7 @@ seq_op = (operator.concat, operator.contains,
 known_builtins = builtins + _unknown_builtin + bin_op_cmp + \
     bin_op_math + bin_op_log + bin_op_bin + seq_op
 
-# hypotesis stuff
+# hypothesis stuff
 numbers = st.floats(allow_nan=False, allow_infinity=False) | st.integers()
 # non seq means non containers
 non_seq = st.none() | st.booleans() | st.text() | numbers | st.binary()
@@ -37,6 +37,7 @@ seq = st.lists(non_seq) | st.tuples(non_seq)
 # mappings
 sets = st.sets(non_seq)
 maps = st.dictionaries(st.text() | st.integers(), non_seq | seq | sets)
+collections = seq | sets | maps
 # all
 random_types = non_seq | seq | sets | maps
 
