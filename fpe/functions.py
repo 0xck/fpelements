@@ -18,7 +18,7 @@ _unknown_builtin = (dict, help, slice, object, enumerate, staticmethod, int, str
 
 
 def _is_variable(func: Callable) -> bool:
-    # checking if function has variable arguments of any kind
+    "Checking if function has variable arguments of any kind"
 
     # only callable
     assert callable(func), AssertNotCallable()
@@ -35,8 +35,7 @@ def _is_variable(func: Callable) -> bool:
 
 
 def _get_defaults(func: Callable) -> Tuple[Any, ...]:
-    """
-    getting function defaults
+    """Getting function defaults
 
     Similar to func.__defaults__
     """
@@ -53,8 +52,7 @@ def _get_defaults(func: Callable) -> Tuple[Any, ...]:
 
 
 def _is_defaults(func: Callable) -> bool:
-    """
-    checking if function has default arguments
+    """Checking if function has default arguments
 
     Similar to bool(func.__defaults__)
     """
@@ -71,8 +69,7 @@ def _is_defaults(func: Callable) -> bool:
 
 
 def _get_arg_count(func: Callable) -> int:
-    """
-    getting number of function arguments
+    """Getting number of function arguments
 
     Similar to func.__code__.co_argcount
     """
@@ -88,7 +85,12 @@ def _get_arg_count(func: Callable) -> int:
 
 
 def _func_to_tuple(func: Callable) -> Tuple[Callable, ...]:
-    # returns tuple from given function
+    """Return tuple from given function
+
+    It works with ordinary functions and with Function objects.
+    Return is always tuple with 1 given function given is not
+    FunctionComposition. Otherwise it returns tuple several functions.
+    """
 
     # only callable
     assert callable(func), AssertNotCallable()
@@ -115,8 +117,11 @@ def is_curried(func: Callable) -> bool:
 
 
 class Function(metaclass=ABCMeta):
-    """
-    Abstract class for representation advanced function features
+    """Abstract class for representation advanced function features
+
+    Function serves as base class for currying and function composition.
+    It provides redefined * and | methods for supporting function
+    composition syntax.
     """
 
     @property
@@ -147,8 +152,7 @@ class Function(metaclass=ABCMeta):
 
     @staticmethod
     def _compose(func1: Callable, func2: Callable) -> "FunctionComposition":
-        """
-        General composition method: (f, g) = g(f)
+        """General composition method: (f, g) = g(f)
 
         It takes 2 functions and return their composition where func1 executes before func2.
         Composition works on all callable objects, but it consider them as one-argument function,
@@ -157,9 +161,6 @@ class Function(metaclass=ABCMeta):
             if function is curried and waits for more than one argument, then it retracted given argument and returns curried function
             otherwise TypeError is raised: 'func expected N arguments, got 1'
         """
-
-        # only callable
-        assert callable(func1) and callable(func2), AssertNotCallable()
 
         composed = FunctionComposition(func1, func2)
 
@@ -182,54 +183,38 @@ class Function(metaclass=ABCMeta):
         return composed
 
     def __mul__(self, other: Callable) -> "FunctionComposition":
-        """
-        math-style composition method: (g * f) = g(f) for left argument
+        """Math-style composition method: (g * f) = g(f) for left argument
 
         Useful when left argument is Function obj and right is any callable.
         Borrowed from (.) :: (b -> c) -> (a -> b) -> a -> c
         """
-
-        # only callable
-        assert callable(other), AssertNotCallable()
 
         return self._compose(other, self)
 
     def __rmul__(self, other: Callable) -> "FunctionComposition":
-        """
-        math-style composition method: (g * f) = g(f) for right argument.
+        """Math-style composition method: (g * f) = g(f) for right argument.
 
         Useful when left argument is not Function obj, but callable and right is Function obj.
         Borrowed from (.) :: (b -> c) -> (a -> b) -> a -> c
         """
 
-        # only callable
-        assert callable(other), AssertNotCallable()
-
         return self._compose(self, other)
 
     def __or__(self, other: Callable) -> "FunctionComposition":
-        """
-        pipe-style composition method: (f | g) = g(f) for left argument
+        """Pipe-style composition method: (f | g) = g(f) for left argument
 
         Useful when left argument is Function obj and right is any callable.
         Reversed composition borrowed from (flip (.)) :: (a -> b) -> (b -> c) -> a -> c
         """
 
-        # only callable
-        assert callable(other), AssertNotCallable()
-
         return self.__rmul__(other)
 
     def __ror__(self, other: Callable) -> "FunctionComposition":
-        """
-        pipe-style composition method: (f | g) = g(f) for right argument
+        """Pipe-style composition method: (f | g) = g(f) for right argument
 
         Useful when left argument is not Function obj, but callable and right is Function obj.
         Reversed composition borrowed from (flip (.)) :: (a -> b) -> (b -> c) -> a -> c
         """
-
-        # only callable
-        assert callable(other), AssertNotCallable()
 
         return self.__mul__(other)
 
@@ -248,8 +233,7 @@ class Function(metaclass=ABCMeta):
 
 
 class CurriedFunctionPositionals(Function):
-    """
-    Curring function with positional only arguments representation class
+    """Curring function with positional only arguments representation class
 
     Thus
         func = CurriedFunctionPositionals(f)
@@ -304,8 +288,7 @@ class CurriedFunctionPositionals(Function):
 
 
 class CurriedFunctionDefaults(Function):
-    """
-    Curring function with defaults arguments representation class
+    """Curring function with defaults arguments representation class
 
     Thus
         func = CurriedFunctionDefaults(f)
@@ -403,8 +386,7 @@ class CurriedFunctionDefaults(Function):
 
 
 class CurriedFunctionFixedArgumentsNumber(Function):
-    """
-    Curring function by using fixed number of positionals representation class
+    """Curring function by using fixed number of positionals representation class
 
     Thus
         func = CurriedFunctionFixedArgumentsNumber(3, f)
@@ -447,18 +429,6 @@ class CurriedFunctionFixedArgumentsNumber(Function):
         # wrong arguments number
         assert num > 1, AssertFunctionWrappingError(
             "number of arguments has to be at least 2")
-        # function is not builtin, does not have variables and
-        # number of fixed is wrong from number of arguments,
-        # that can be provided
-        assert not (
-            # function is not builtin
-            ((func not in _unknown_builtin) and (not inspect.isbuiltin(func))) and \
-            # function does not have variables
-            (not _is_variable(func)) and \
-            # too less number (never executed) of arguments or too much (executes with TypeError)
-            ((_get_arg_count(func) < num) or (_get_arg_count(func) - len(_get_defaults(func)) > num))
-        ), AssertFunctionWrappingError(
-            "wrong number of fixed arguments: too less or too much fixed arguments for given function")
 
         self._func: Callable = func
         self._args: Tuple[Any, ...] = tuple()
@@ -494,10 +464,9 @@ class CurriedFunctionFixedArgumentsNumber(Function):
 
 
 class FunctionComposition(Function):
-    """
-    Function composition representation class
+    """Function composition representation class
 
-    Similar to FunctionComposition(f, g)(x) == g(f(x))
+    Thus FunctionComposition(f, g)(x) == g(f(x))
 
     Borrowed from (.) :: (b -> c) -> (a -> b) -> a -> c
 
@@ -547,10 +516,11 @@ class FunctionComposition(Function):
 
 
 class _idFunction(Function):
-    """
-    Class for representation id function
+    """Class for representation id function
 
-    id functions returns given value
+    id functions returns given value.
+
+    Thus _idFunction()(x) == x
 
     Borrowed from id :: a -> a
     """
@@ -579,8 +549,7 @@ id_ = _idFunction()
 
 
 def _curry_common(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunctionPositionals]:
-    """
-    Curring function for functions with at least 2 positional and keyword arguments
+    """Curring function for functions with at least 2 positional and keyword arguments
 
     Thus:
         for positionals: curry(f)(x)(y, z) == curry(f)(x, y)(z) == f(x, y, z)
@@ -614,8 +583,7 @@ def _curry_common(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunct
 
 @_curry_common
 def _curry_fixed(num: int, func: Callable) -> CurriedFunctionFixedArgumentsNumber:
-    """
-    Curring function for functions with given number of positional arguments
+    """Curring function for functions with given number of positional arguments
 
     Thus curry(3)(f)(x)(y, z) == curry(3)(f)(x, y)(z) == f(x, y, z)
     """
@@ -636,8 +604,7 @@ def _curry_fixed(num: int, func: Callable) -> CurriedFunctionFixedArgumentsNumbe
 def curry(func_or_num: Union[int, Callable]) -> Union[CurriedFunctionDefaults,
                                                     CurriedFunctionPositionals,
                                                     CurriedFunctionFixedArgumentsNumber]:
-    """
-    Decorator for curring function of at least 2 arguments
+    """Decorator for curring function of at least 2 arguments
 
     Thus:
         for positionals: curry(f)(x)(y, z) == curry(f)(x, y)(z) == f(x, y, z)
@@ -657,23 +624,19 @@ def curry(func_or_num: Union[int, Callable]) -> Union[CurriedFunctionDefaults,
 
 
 @curry
-def compose(func2: Callable, func1: Callable) -> FunctionComposition:
-    """
-    Wrapper on Function._compose for getting any 2 functions composed in math-style
+def compose(func1: Callable, func2: Callable) -> FunctionComposition:
+    """Wrapper on Function._compose for getting any 2 functions composed in math-style
 
-    It takes 2 functions and return their composition where func1 executes before func2.
     This is math-style composition, so second given function will be executed first.
     Thus compose(g, f)(x) == g(f(x))
     """
-    return Function._compose(func1, func2)
+    return Function._compose(func2, func1)
 
 
 @curry
 def pipe(func1: Callable, func2: Callable) -> FunctionComposition:
-    """
-    Wrapper on Function._compose for getting any 2 functions composed in pipe-style
+    """Wrapper on Function._compose for getting any 2 functions composed in pipe-style
 
-    It takes 2 functions and return their composition where func1 executes before func2.
     This is pipe-style composition, so first given function will be executed first.
     Thus pipe(f, g)(x) == g(f(x))
     """
