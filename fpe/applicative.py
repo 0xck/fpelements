@@ -5,12 +5,13 @@ from fpe.functor import AbstractFunctor
 
 
 class AbstractApplicative(AbstractFunctor):
+    """An abstract class which represents na Applicative Functor conception.
+    """
 
     @staticmethod
     @abstractstaticmethod
     def pure(value: Any):
-        """
-        Lift a value function.
+        """Lift a value function.
 
         Borrowed from pure :: a -> f a
         """
@@ -18,8 +19,7 @@ class AbstractApplicative(AbstractFunctor):
 
     @abstractmethod
     def __mod__(self, func: Callable):
-        """
-        Sequential application function.
+        """Sequential application function.
 
         Borrower from (<*>) :: f (a -> b) -> f a -> f b
         May be defined as liftA2 id
@@ -39,8 +39,7 @@ class AbstractApplicative(AbstractFunctor):
     @staticmethod
     @abstractstaticmethod
     def liftA2(func: Callable, fa, fb):
-        """
-        Lift a binary function to actions.
+        """Lift a binary function to actions.
 
         Borrowed from liftA2 :: (a -> b -> c) -> f a -> f b -> f c
         May be defined as liftA2 f x y = f <$> x <*> y

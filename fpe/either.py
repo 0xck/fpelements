@@ -15,9 +15,36 @@ EitherGenerator = Generator[Eithers, None, None]
 
 
 class Either(AbstractMonad, AbstractSemigroup):
+    """An abstract class for representation Either from Haskell
+
+    In whole, class represents conception of handling computation
+    that can not finished due domain definition is not compatible
+    value area, e.g. 1/0 can not be finished. In this case result
+    can not be retrived, but can be represented in some way.
+    Here Right class contains finished computation, and
+    Left class contains something that represents computation failure.
+    E.g.
+        def div(a, b):
+            if b == 0:
+                return Left("ZeroDivision")
+            else:
+                return Right(a//b)
+
+        div(42, 2) == Right(21)
+        div(42, 0) == Left("ZeroDivision")
+
+    Borrowed from data Either a b = Left a | Right b
+    """
 
     @staticmethod
     def pure(value: Any):
+        """Implementation of pure from ApplicativeFunctor.
+
+        Return value contexted by Right class.
+        E.g.
+            pure(42) == Right(42)
+            pure(isinstance) = Right(isinstance)
+        """
 
         if isinstance(value, Either):
             return value
@@ -27,6 +54,14 @@ class Either(AbstractMonad, AbstractSemigroup):
     @staticmethod
     @curry
     def liftA2(func: Callable, either1: Eithers, either2: Eithers) -> Eithers:
+        """Implementation of lift2 from ApplicativeFunctor.
+
+        It applies binary function to two Either contexted values.
+        E.g.
+            lift2(max, Right(1), Right(42)) == Right(42)
+            lift2(max, Right(1), Left("ZeroDivision")) == Left("ZeroDivision")
+            lift2(max, Left("ZeroDivision"), Right(42)) == Left("ZeroDivision")
+        """
 
         # only callabe
         assert callable(func), AssertNotCallable()
@@ -57,6 +92,10 @@ class Either(AbstractMonad, AbstractSemigroup):
 
 
 class Left(Either):
+    """Left class for representation failed computation
+
+    Borrowed from Left :: a -> Either a b
+    """
 
     def __init__(self, value: Any):
         self._value = value
@@ -79,6 +118,10 @@ class Left(Either):
 
 
 class Right(Either):
+    """Right class for representation completed computation
+
+    Borrowed from Right :: b -> Either a b
+    """
 
     def __init__(self, value: Any):
         self._value = value

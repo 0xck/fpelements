@@ -6,13 +6,15 @@ from fpe.functions import curry
 
 
 class AbstractFunctor(metaclass=ABCMeta):
+    """An abstract class which represents a Functor conception.
+    """
 
     @abstractmethod
     def fmap(self, func: Callable) -> Any:
-        """
-        fmap function for mapping values with functions
+        """fmap function for mapping values with functions
 
         Borrowed from fmap :: (a -> b) -> f a -> f b
+        Very similar to builtin map on sequences.
 
         Note.
             fmap must satisfy the following laws:
@@ -27,6 +29,7 @@ class AbstractFunctor(metaclass=ABCMeta):
 
 @curry
 def fmap(func: Callable, instance) -> Any:
+    """Common fmap function"""
 
     # only callable
     assert callable(func), AssertNotCallable()

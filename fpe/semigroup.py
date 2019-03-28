@@ -2,11 +2,12 @@ from abc import ABCMeta, abstractmethod
 
 
 class AbstractSemigroup(metaclass=ABCMeta):
+    """An abstract class which represents a Semigroup conception.
+    """
 
     @abstractmethod
     def __and__(self, other):
-        """
-        An associative operation.
+        """An associative operation.
 
         Borrowed from (<>) :: a -> a -> a
         Note.

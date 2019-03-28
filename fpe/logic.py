@@ -6,8 +6,7 @@ from fpe.functions import curry
 
 @curry
 def ite(predicate: Callable, alternative: Any, value: Any) -> Any:
-    """
-    Ternary predicate function: if then else
+    """Ternary predicate function: if then else
 
     Same as value if predicate(value) else alternative
     """
