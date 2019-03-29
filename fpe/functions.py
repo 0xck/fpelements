@@ -1,6 +1,6 @@
 import inspect
 from abc import ABCMeta, abstractmethod
-from collections.abc import OrderedDict
+from collections import OrderedDict
 from functools import reduce
 from typing import Any, Callable, Dict, Tuple, Union
 
