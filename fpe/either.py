@@ -15,13 +15,13 @@ EitherGenerator = Generator[Eithers, None, None]
 
 
 class Either(AbstractMonad, AbstractSemigroup):
-    """An abstract class for representation Either from Haskell
+    """An abstract class for representation Either from Haskell.
 
     In whole, class represents conception of handling computation
-    that can not finished due domain definition is not compatible
-    value area, e.g. 1/0 can not be finished. In this case result
-    can not be retrived, but can be represented in some way.
-    Here Right class contains finished computation, and
+    that can not performed due some reason, e.g. domain of function
+    might not be compatible its range, e.g. 1/0 can not be finished.
+    In this case result can not be retrived, but can be represented
+    in some way. Here Right class contains finished computation, and
     Left class contains something that represents computation failure.
     E.g.
         def div(a, b):
@@ -37,7 +37,7 @@ class Either(AbstractMonad, AbstractSemigroup):
     """
 
     @staticmethod
-    def pure(value: Any):
+    def pure(value: Any) -> "Right":
         """Implementation of pure from ApplicativeFunctor.
 
         Return value contexted by Right class.
@@ -92,7 +92,7 @@ class Either(AbstractMonad, AbstractSemigroup):
 
 
 class Left(Either):
-    """Left class for representation failed computation
+    """Left class for representation failed computation.
 
     Borrowed from Left :: a -> Either a b
     """
@@ -118,7 +118,7 @@ class Left(Either):
 
 
 class Right(Either):
-    """Right class for representation completed computation
+    """Right class for representation completed computation.
 
     Borrowed from Right :: b -> Either a b
     """
