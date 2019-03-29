@@ -4,7 +4,7 @@ from fpe.base import flip
 from fpe.functions import curry
 
 
-isinstance_ =  curry(2)(flip(isinstance))
+isinstance_ = curry(2)(flip(isinstance))
 isinstance_.__doc__ = """Curried version of builtin isinstance.
 
 1st argument is type or tuple of types of possible classes,
