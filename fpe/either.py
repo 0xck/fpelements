@@ -1,4 +1,4 @@
-from collections import Iterable
+from collections.abc import Iterable
 from typing import Any, Callable, Collection, Generator, NoReturn, Tuple, Union
 
 from fpe.asserts import AssertNotCallable, AssertWrongArgumentType
