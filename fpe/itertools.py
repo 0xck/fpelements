@@ -1,4 +1,5 @@
 from itertools import dropwhile, islice, takewhile, zip_longest
+from functools import reduce
 from typing import Any, Callable, Collection, Iterable, NoReturn, Union
 
 from fpe.builtins import map_, zip_
@@ -60,3 +61,67 @@ def zipWithPad(func: Callable, pad: Any, iterable: Iterable, *args: Iterable) ->
     """
 
     return (func(*i) for i in zip_longest(iterable, *args, fillvalue=pad))
+
+
+@curry
+def foldl(func: Callable, init: Any, iterable: Iterable) -> Union[Any, NoReturn]:
+    """Curried version of functools.reduce with defined initial.
+
+    Apply a function of two arguments cumulatively to the items of a sequence,
+    from left to right, so as to reduce the sequence to a single value.
+    E.g.
+        reduce(lambda acc, x: acc + x, [3, 4, 14, 21], 0) == ((((0+3)+4)+14)+21) == 42
+        reduce(lambda acc, x: acc + x, [], 0) == 0
+
+    Literally reduce(func, iterable, init)
+    """
+
+    return reduce(func, iterable, init)
+
+
+@curry
+def foldl_(func: Callable, iterable: Iterable) -> Union[Any, NoReturn]:
+    """Curried version of functools.reduce with 1st element as initial.
+
+    Apply a function of two arguments cumulatively to the items of a sequence,
+    from left to right, so as to reduce the sequence to a single value.
+    E.g.
+        reduce(lambda acc, x: acc + x, [3, 4, 14, 21]) == (((3+4)+14)+21) == 42
+        reduce(lambda acc, x: acc + x, [])  # raise TypeError
+
+    Literally reduce(func, iterable)
+    """
+
+    return reduce(func, iterable)
+
+
+@curry
+def foldr(func: Callable, init: Any, iterable: Iterable) -> Union[Any, NoReturn]:
+    """Curried version of functools.reduce with defined initial and reversed sequence.
+
+    Apply a function of two arguments cumulatively to the items of a sequence,
+    from right to left, so as to reduce the sequence to a single value.
+    E.g.
+        reduce(lambda acc, x: acc + x, [3, 4, 14, 21], 0) == ((((0+21)+14)+4)+3) == 42
+        reduce(lambda acc, x: acc + x, [], 0) == 0
+
+    Literally reduce(func, reversed(iterable), init)
+    """
+
+    return reduce(func, reversed(iterable), init)
+
+
+@curry
+def foldr_(func: Callable, iterable: Iterable) -> Union[Any, NoReturn]:
+    """Curried version of functools.reduce with 1st element as initial and reversed sequence.
+
+    Apply a function of two arguments cumulatively to the items of a sequence,
+    from right to left, so as to reduce the sequence to a single value.
+    E.g.
+        reduce(lambda acc, x: acc + x, [3, 4, 14, 21]) == (((21+14)+4)+3) == 42
+        reduce(lambda acc, x: acc + x, [])  # raise TypeError
+
+    Literally reduce(func, reversed(iterable))
+    """
+
+    return reduce(func, reversed(iterable))
