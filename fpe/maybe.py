@@ -1,5 +1,4 @@
-from collections import Iterable
-from typing import Any, Callable, Collection, Generator, NoReturn, Tuple, Union
+from typing import Any, Callable, Collection, Generator, NoReturn, Union
 
 from fpe.asserts import AssertNotCallable, AssertWrongArgumentType
 from fpe.functions import curry
