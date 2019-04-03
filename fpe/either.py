@@ -2,7 +2,7 @@ from collections.abc import Iterable
 from typing import Any, Callable, Collection, Generator, NoReturn, Tuple, Union
 
 from fpe.asserts import AssertNotCallable, AssertWrongArgumentType
-from fpe.functions import curry
+from fpe.functions import curry, enrich
 from fpe.monad import AbstractMonad
 from fpe.semigroup import AbstractSemigroup
 
@@ -37,7 +37,8 @@ class Either(AbstractMonad, AbstractSemigroup):
     """
 
     @staticmethod
-    def pure(value: Any) -> "Right":
+    @enrich
+    def pure(value: Any) -> Eithers:
         """Implementation of pure from ApplicativeFunctor.
 
         Return value contexted by Right class.
@@ -157,6 +158,7 @@ class Right(Either):
         return self
 
 
+@enrich
 def lefts(seq: Union[EitherCollection, EitherGenerator]) -> Tuple[Left, ...]:
 
     # seq has to be iterable
@@ -165,6 +167,7 @@ def lefts(seq: Union[EitherCollection, EitherGenerator]) -> Tuple[Left, ...]:
     return tuple(i._value for i in seq if isinstance(i, Left))
 
 
+@enrich
 def rights(seq: Union[EitherCollection, EitherGenerator]) -> Tuple[Right, ...]:
 
     # seq has to be iterable
