@@ -124,19 +124,17 @@ class Function(metaclass=ABCMeta):
     composition syntax.
     """
 
-    @property
-    @abstractmethod
-    def retracted(self) -> int:
-        pass
-
-    @property
-    @abstractmethod
-    def is_curried(self) -> bool:
-        pass
-
     @abstractmethod
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         pass
+
+    @property
+    def is_curried(self) -> bool:
+        return False
+
+    @property
+    def retracted(self) -> int:
+        return 0
 
     @property
     def func(self) -> Union[Callable, Tuple[Callable, ...]]:
@@ -218,11 +216,12 @@ class Function(metaclass=ABCMeta):
 
         return self.__mul__(other)
 
-    def _copy_meta(self, defaults=(None, None, None, None)):
+    def _copy_meta(self, defaults=("Unknown", None, None, None)):
 
         # assign some meta
-        self.__doc__ = getattr(self._func, "__doc__", defaults[0])
-        self.__name__ = getattr(self._func, "__name__", defaults[1])
+        self.__name__ = "Wrapped: <{}>".format(
+            getattr(self._func, "__name__", defaults[0]))
+        self.__doc__ = getattr(self._func, "__doc__", defaults[1])
         self.__module__ = getattr(self._func, "__module__", defaults[2])
         self.__qualname__ = getattr(self._func, "__qualname__", defaults[3])
 
@@ -433,7 +432,7 @@ class CurriedFunctionFixedArgumentsNumber(Function):
         self._func: Callable = func
         self._args: Tuple[Any, ...] = tuple()
         self._original_arg_count: int = num
-        self._copy_meta(defaults=("curried: {}".format(func), None, None, None))
+        self._copy_meta()
 
     @property
     def args(self) -> Tuple[Any, ...]:
@@ -493,14 +492,6 @@ class FunctionComposition(Function):
         assert all(callable(i) for i in self._func), AssertFunctionWrappingError(
             "composition must contains only callable objects")
 
-    @property
-    def retracted(self) -> int:
-        return 0
-
-    @property
-    def is_curried(self) -> bool:
-        return False
-
     def __call__(self, value: Any) -> Any:
 
         result = value
@@ -515,37 +506,20 @@ class FunctionComposition(Function):
             return "{}, retracted: functions <{}>".format(self.__class__.__name__, self._func)
 
 
-class _idFunction(Function):
-    """Class for representation id function
+class FunctionEnrichment(Function):
+    """Helper class for enrichment any function with ability to composition"""
 
-    id functions returns given value.
+    def __init__(self, func: Callable):
 
-    Thus _idFunction()(x) == x
+        # only callable
+        assert callable(func), AssertNotCallable()
 
-    Borrowed from id :: a -> a
-    """
+        self._func: Callable = func
+        self._copy_meta()
 
-    @property
-    def func(self) -> "_idFunction":
-        return self
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
 
-    @property
-    def retracted(self) -> int:
-        return 0
-
-    @property
-    def is_curried(self) -> bool:
-        return False
-
-    def __call__(self, value: Any) -> Any:
-        return value
-
-    def __repr__(self):
-        return "id"
-
-
-# id function
-id_ = _idFunction()
+        return self._func(*args, **kwargs)
 
 
 def _curry_common(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunctionPositionals]:
@@ -621,6 +595,32 @@ def curry(func_or_num: Union[int, Callable]) -> Union[CurriedFunctionDefaults,
         return _curry_fixed(func_or_num)
 
     return _curry_common(func_or_num)
+
+
+def enrich(func):
+    """Decorator for enrichment any function with ability to composition"""
+
+    enriched = FunctionEnrichment(func)
+
+    # wrong func
+    assert func is enriched.func, AssertCurringError(
+        "processed function is different from origin")
+
+    return enriched
+
+
+@enrich
+def id_(value: Any) -> Any:
+    """The id function.
+
+    id functions returns given value.
+
+    Thus id_(x) == x
+
+    Borrowed from id :: a -> a
+    """
+
+    return value
 
 
 @curry
