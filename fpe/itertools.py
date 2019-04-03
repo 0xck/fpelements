@@ -1,7 +1,8 @@
-from itertools import dropwhile, islice, takewhile, zip_longest
 from functools import reduce
-from typing import Any, Callable, Collection, Iterable, NoReturn, Union
+from itertools import accumulate, dropwhile, islice, takewhile, zip_longest
+from typing import Any, Callable, Iterable, NoReturn, Union
 
+from fpe.base import flip
 from fpe.builtins import map_, zip_
 from fpe.functions import curry
 
@@ -26,6 +27,14 @@ def drop(num: int, iterable: Iterable) -> Union[Iterable, NoReturn]:
 
     return islice(iterable, num, None)
 
+
+accumulate_ = curry(2)(flip(accumulate))
+accumulate_.__doc__ = """Curried version of itertools.accumulate.
+
+accumulate_ retracts 1st as function that will be applied on items
+and waiting for iterable.
+Literally accumulate(iterable, func)
+"""
 
 zipWith = curry(3)(map)
 zipWith.__doc__ = """Curried builtin map for at least 2 iterables.
