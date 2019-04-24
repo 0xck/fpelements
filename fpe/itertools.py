@@ -1,6 +1,6 @@
 from functools import reduce
 from itertools import accumulate, dropwhile, islice, takewhile, zip_longest, filterfalse
-from typing import Any, Callable, Iterable, NoReturn, Union
+from typing import Any, Callable, Iterable, NoReturn, Union, Tuple
 
 from fpe.base import flip
 from fpe.builtins import map_, zip_
