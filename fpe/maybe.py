@@ -1,7 +1,7 @@
 from typing import Any, Callable, Collection, Generator, NoReturn, Union
 
 from fpe.asserts import AssertNotCallable, AssertWrongArgumentType
-from fpe.functions import curry, enrich
+from fpe.functions import curry, enrichFunction
 from fpe.monad import AbstractMonad
 from fpe.semigroup import AbstractSemigroup
 
@@ -36,7 +36,7 @@ class Maybe(AbstractMonad, AbstractSemigroup):
     """
 
     @staticmethod
-    @enrich
+    @enrichFunction
     def pure(value: Any) -> Maybies:
         """Implementation of pure from ApplicativeFunctor.
 

@@ -597,7 +597,7 @@ def curry(func_or_num: Union[int, Callable]) -> Union[CurriedFunctionDefaults,
     return _curry_common(func_or_num)
 
 
-def enrich(func):
+def enrichFunction(func):
     """Decorator for enrichment any function with ability to composition"""
 
     enriched = FunctionEnrichment(func)
@@ -609,7 +609,7 @@ def enrich(func):
     return enriched
 
 
-@enrich
+@enrichFunction
 def id_(value: Any) -> Any:
     """The id function.
 
