@@ -56,7 +56,9 @@ def setattr_(name: str, value: Any, obj: Any) -> Optional[NoReturn]:
     E.g. setattr_("attr", 42, obj)
     """
 
-    return setattr(obj, name, value)
+    setattr(obj, name, value)
+
+    return None
 
 
 zip_ = curry(2)(zip)
