@@ -106,6 +106,9 @@ class Nothing_(Maybe):
     used in code as representation computation failure.
     E. g. 1/0 = Nothing, not 1/0 = Nothing_(). For class checking
     also use Nothing_, e.g. isinstance(Nothing, Nothing_)
+    Note.
+        Nothing is object of Nothing_, but is not really singleton,
+        anyway you do not need to create more Nothing_ objects.
 
     Borrowed from Nothing :: Maybe a
     """
