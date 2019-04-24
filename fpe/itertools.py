@@ -1,5 +1,5 @@
 from functools import reduce
-from itertools import accumulate, dropwhile, islice, takewhile, zip_longest
+from itertools import accumulate, dropwhile, islice, takewhile, zip_longest, filterfalse
 from typing import Any, Callable, Iterable, NoReturn, Union
 
 from fpe.base import flip
@@ -134,3 +134,30 @@ def foldr_(func: Callable, iterable: Iterable) -> Union[Any, NoReturn]:
     """
 
     return reduce(func, reversed(iterable))
+
+
+@curry
+def collect(predicate: Callable[[Any, ...], Bool], func: Callable,
+            iterable: Iterable) -> Union[Iterable, NoReturn]:
+    """Combined map and filter function.
+
+    It filters given iterable with predicate and applies func
+    on filtered items.
+    Literally map(func, filter(predicate, iterable))
+
+    Borrowed from Scala collect method.
+    """
+
+    return map(func, filter(predicate, iterable))
+
+
+@curry
+def variants(predicate: Callable[[Any, ...], Bool],
+            iterable: Iterable) -> Union[Tuple[Iterable, Iterable], NoReturn]:
+    """Combined filter and itertools.filterfalse function.
+
+    It returns tuple from filtered and rest items.
+    Literally (filter(predicate, iterable), filterfalse(predicate, iterable))
+    """
+
+    return (filter(predicate, iterable), filterfalse(predicate, iterable))
