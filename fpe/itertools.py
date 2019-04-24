@@ -137,7 +137,7 @@ def foldr_(func: Callable, iterable: Iterable) -> Union[Any, NoReturn]:
 
 
 @curry
-def collect(predicate: Callable[[...], bool], func: Callable,
+def collect(predicate: Callable[..., bool], func: Callable,
             iterable: Iterable) -> Union[Iterable, NoReturn]:
     """Combined map and filter function.
 
@@ -152,7 +152,7 @@ def collect(predicate: Callable[[...], bool], func: Callable,
 
 
 @curry
-def variants(predicate: Callable[[...], bool],
+def variants(predicate: Callable[..., bool],
             iterable: Iterable) -> Union[Tuple[Iterable, Iterable], NoReturn]:
     """Combined filter and itertools.filterfalse function.
 
