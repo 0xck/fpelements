@@ -1,7 +1,7 @@
 from typing import Any
 
 
-class AssertError:
+class AssertError(AssertionError):
 
     @property
     def error(self) -> Any:
