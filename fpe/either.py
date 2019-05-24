@@ -75,6 +75,12 @@ class Either(AbstractMonad, AbstractSemigroup):
     def value(self) -> NoReturn:
         raise AttributeError("Value of Either can not be used directly")
 
+    def isLeft(self) -> bool:
+        return isinstance(self, Left)
+
+    def isRight(self) -> bool:
+        return isinstance(self, Right)
+
     def __eq__(self, other) -> bool:
 
         if type(self) is not type(other):
