@@ -1,4 +1,3 @@
-from functools import reduce
 from itertools import accumulate, dropwhile, islice, takewhile, zip_longest, filterfalse
 from typing import Any, Callable, Iterable, NoReturn, Union, Tuple
 
@@ -73,70 +72,6 @@ def zipWithPad(func: Callable, pad: Any, iterable: Iterable, *args: Iterable) ->
 
 
 @curry
-def foldl(func: Callable, init: Any, iterable: Iterable) -> Union[Any, NoReturn]:
-    """Curried version of functools.reduce with defined initial.
-
-    Apply a function of two arguments cumulatively to the items of a sequence,
-    from left to right, so as to reduce the sequence to a single value.
-    E.g.
-        reduce(lambda acc, x: acc + x, [3, 4, 14, 21], 0) == ((((0+3)+4)+14)+21) == 42
-        reduce(lambda acc, x: acc + x, [], 0) == 0
-
-    Literally reduce(func, iterable, init)
-    """
-
-    return reduce(func, iterable, init)
-
-
-@curry
-def foldl_(func: Callable, iterable: Iterable) -> Union[Any, NoReturn]:
-    """Curried version of functools.reduce with 1st element as initial.
-
-    Apply a function of two arguments cumulatively to the items of a sequence,
-    from left to right, so as to reduce the sequence to a single value.
-    E.g.
-        reduce(lambda acc, x: acc + x, [3, 4, 14, 21]) == (((3+4)+14)+21) == 42
-        reduce(lambda acc, x: acc + x, [])  # raise TypeError
-
-    Literally reduce(func, iterable)
-    """
-
-    return reduce(func, iterable)
-
-
-@curry
-def foldr(func: Callable, init: Any, iterable: Iterable) -> Union[Any, NoReturn]:
-    """Curried version of functools.reduce with defined initial and reversed sequence.
-
-    Apply a function of two arguments cumulatively to the items of a sequence,
-    from right to left, so as to reduce the sequence to a single value.
-    E.g.
-        reduce(lambda acc, x: acc + x, [3, 4, 14, 21], 0) == ((((0+21)+14)+4)+3) == 42
-        reduce(lambda acc, x: acc + x, [], 0) == 0
-
-    Literally reduce(func, reversed(iterable), init)
-    """
-
-    return reduce(func, reversed(iterable), init)
-
-
-@curry
-def foldr_(func: Callable, iterable: Iterable) -> Union[Any, NoReturn]:
-    """Curried version of functools.reduce with 1st element as initial and reversed sequence.
-
-    Apply a function of two arguments cumulatively to the items of a sequence,
-    from right to left, so as to reduce the sequence to a single value.
-    E.g.
-        reduce(lambda acc, x: acc + x, [3, 4, 14, 21]) == (((21+14)+4)+3) == 42
-        reduce(lambda acc, x: acc + x, [])  # raise TypeError
-
-    Literally reduce(func, reversed(iterable))
-    """
-
-    return reduce(func, reversed(iterable))
-
-
-@curry
 def collect(predicate: Callable[..., bool], func: Callable,
             iterable: Iterable) -> Union[Iterable, NoReturn]:
     """Combined map and filter function.
@@ -152,12 +87,14 @@ def collect(predicate: Callable[..., bool], func: Callable,
 
 
 @curry
-def variants(predicate: Callable[..., bool],
-            iterable: Iterable) -> Union[Tuple[Iterable, Iterable], NoReturn]:
+def partition(predicate: Callable[..., bool],
+              iterable: Iterable) -> Union[Tuple[Iterable, Iterable], NoReturn]:
     """Combined filter and itertools.filterfalse function.
 
     It returns tuple from filtered and rest items.
     Literally (filter(predicate, iterable), filterfalse(predicate, iterable))
+
+    Borrowed from partition :: (a -> Bool) -> [a] -> ([a], [a])
     """
 
     return (filter(predicate, iterable), filterfalse(predicate, iterable))
