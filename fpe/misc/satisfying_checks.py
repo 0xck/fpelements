@@ -1,7 +1,7 @@
 from typing import Any, Callable
 
 from fpe.applicative import AbstractApplicative
-from fpe.asserts import (AssertCheckingFailed, AssertNotCallable,
+from fpe.asserts import (AssertCheckingFailed, AssertNonCallable,
                          AssertWrongArgumentType)
 from fpe.functions import compose, id_
 from fpe.functor import AbstractFunctor, fmap
@@ -48,7 +48,7 @@ def fmap_simple_satisfy_check(instance: AbstractFunctor, func1: Callable, func2:
     """
 
     # only callable
-    assert callable(func1) and callable(func2), AssertNotCallable()
+    assert callable(func1) and callable(func2), AssertNonCallable()
     # only Functor
     assert isinstance(instance, AbstractFunctor), AssertWrongArgumentType(
         "AbstractFunctor")
@@ -85,7 +85,7 @@ def applicative_simple_satisfy_check(instance_value: AbstractApplicative,
     """
 
     # only callable
-    assert callable(func), AssertNotCallable()
+    assert callable(func), AssertNonCallable()
     # only Applicative
     assert all(isinstance(i, AbstractApplicative) for i in (
         instance_value, instance_func1, instance_func2)), AssertWrongArgumentType("AbstractApplicative")
@@ -136,7 +136,7 @@ def monad_simple_satisfy_check(instance: AbstractMonad, func1: Callable, func2: 
     """
 
     # only callable
-    assert callable(func1) and callable(func2), AssertNotCallable()
+    assert callable(func1) and callable(func2), AssertNonCallable()
     # only Monad
     assert isinstance(instance, AbstractMonad), AssertWrongArgumentType(
         "AbstractMonad")

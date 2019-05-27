@@ -1,6 +1,6 @@
 from typing import Any, Callable, Collection, Generator, NoReturn, Union
 
-from fpe.asserts import AssertNotCallable, AssertWrongArgumentType
+from fpe.asserts import AssertNonCallable, AssertWrongArgumentType
 from fpe.functions import curry, enrichFunction
 from fpe.monad import AbstractMonad
 from fpe.semigroup import AbstractSemigroup
@@ -64,7 +64,7 @@ class Maybe(AbstractMonad, AbstractSemigroup):
         """
 
         # only callabe
-        assert callable(func), AssertNotCallable()
+        assert callable(func), AssertNonCallable()
         # only Maybe
         assert isinstance(maybe1, Maybe) and isinstance(maybe2, Maybe), AssertWrongArgumentType("Maybe")
 
@@ -142,14 +142,14 @@ class Just(Maybe):
     def fmap(self, func: Callable) -> "Just":
 
         # only callable
-        assert callable(func), AssertNotCallable()
+        assert callable(func), AssertNonCallable()
 
         return Just(func(self._value))
 
     def __mod__(self, maybe: Maybies) -> Maybies:
 
         # only callable
-        assert callable(self._value), AssertNotCallable()
+        assert callable(self._value), AssertNonCallable()
         # only Maybe
         assert isinstance(maybe, Maybe), AssertWrongArgumentType("Maybe")
 
@@ -158,7 +158,7 @@ class Just(Maybe):
     def __rshift__(self, func: Callable[..., Maybies]) -> Maybies:
 
         # only callable
-        assert callable(func), AssertNotCallable()
+        assert callable(func), AssertNonCallable()
 
         return func(self._value)
 

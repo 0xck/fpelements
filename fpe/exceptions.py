@@ -1,5 +1,5 @@
 from fpe.either import Left, Right
-from fpe.asserts import AssertNotCallable
+from fpe.asserts import AssertNonCallable
 from fpe.functions import enrichFunction
 
 
@@ -25,7 +25,7 @@ def try_(func_or_obj, *args, **kwargs):
         try_(div, 42, 2)  # Right(21)
         try_(div, 42, 0)  # Left(ZeroDivisionError('...'))
 
-        # variant with classical function form demands additional `lambda`
+        # classical function's call demands additional `lambda`
         try_(lambda: div(42, 2))  # Right(21)
         try_(lambda: div(42, 0))  # Left(ZeroDivisionError('...'))
 
@@ -34,8 +34,9 @@ def try_(func_or_obj, *args, **kwargs):
         See `FATAL_EXCEPTIONS` for checking non-handled exception types.
     """
 
-    assert callable(func_or_obj) or (not callable(func_or_obj) and not (bool(args) or bool(kwargs))
-        ), AssertNotCallable("Can not handle non-callable object with arguments.")
+    assert callable(func_or_obj) or (
+            not callable(func_or_obj) and not (bool(args) or bool(kwargs))), AssertNonCallable(
+                "Can not handle non-callable object with arguments.")
 
     if not callable(func_or_obj):
         return Right(func_or_obj)

@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any, Callable
 
-from fpe.asserts import AssertNotCallable, AssertWrongArgumentType
+from fpe.asserts import AssertNonCallable, AssertWrongArgumentType
 from fpe.functions import curry
 
 
@@ -32,7 +32,7 @@ def fmap(func: Callable, instance) -> Any:
     """Common fmap function"""
 
     # only callable
-    assert callable(func), AssertNotCallable()
+    assert callable(func), AssertNonCallable()
     # only Functor
     assert isinstance(instance, AbstractFunctor), AssertWrongArgumentType(
         "AbstractFunctor")

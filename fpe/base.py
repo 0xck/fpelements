@@ -1,6 +1,6 @@
 from typing import Any, Callable
 
-from fpe.asserts import AssertNotCallable, AssertWrongArgumentType
+from fpe.asserts import AssertNonCallable, AssertWrongArgumentType
 
 
 def flip(func: Callable[[Any, Any], Any]) -> Callable:
@@ -12,7 +12,7 @@ def flip(func: Callable[[Any, Any], Any]) -> Callable:
     """
 
     # only callable
-    assert callable(func), AssertNotCallable()
+    assert callable(func), AssertNonCallable()
 
     def flipped(first: Any, second: Any) -> Any:
         """Swapping provided arguments to given function.

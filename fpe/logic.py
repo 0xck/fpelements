@@ -1,6 +1,6 @@
 from typing import Any, Callable
 
-from fpe.asserts import AssertNotCallable
+from fpe.asserts import AssertNonCallable
 from fpe.functions import curry
 
 
@@ -12,6 +12,6 @@ def ite(predicate: Callable, alternative: Any, value: Any) -> Any:
     """
 
     # only callable
-    assert callable(predicate), AssertNotCallable()
+    assert callable(predicate), AssertNonCallable()
 
     return value if predicate(value) else alternative

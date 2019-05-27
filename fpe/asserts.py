@@ -20,7 +20,7 @@ class AssertWrongArgumentType(AssertError):
         super().__init__("Argument has to be " + correct)
 
 
-class AssertNotCallable(AssertError):
+class AssertNonCallable(AssertError):
 
     def __init__(self):
         super().__init__("Item has to be callable")
