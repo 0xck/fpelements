@@ -229,4 +229,9 @@ def isLeft(either: Eithers) -> bool:
 
 @enrichFunction
 def isRight(either: Eithers) -> bool:
-    return not isLeft(either)
+
+    # only Either
+    assert isinstance(either, Either), AssertWrongArgumentType(
+        "Either")
+
+    return isinstance(either, Right)
