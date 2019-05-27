@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from typing import Any, Callable, Collection, Generator, NoReturn, Tuple, Union
 
-from fpe.asserts import AssertNotCallable, AssertWrongArgumentType
+from fpe.asserts import AssertNonCallable, AssertWrongArgumentType
 from fpe.functions import curry, enrichFunction
 from fpe.monad import AbstractMonad
 from fpe.semigroup import AbstractSemigroup
@@ -65,7 +65,7 @@ class Either(AbstractMonad, AbstractSemigroup):
         """
 
         # only callabe
-        assert callable(func), AssertNotCallable()
+        assert callable(func), AssertNonCallable()
         # only Either
         assert isinstance(either1, Either) and isinstance(either2, Either), AssertWrongArgumentType("Either")
 
@@ -74,12 +74,6 @@ class Either(AbstractMonad, AbstractSemigroup):
     @property
     def value(self) -> NoReturn:
         raise AttributeError("Value of Either can not be used directly")
-
-    def isLeft(self) -> bool:
-        return isinstance(self, Left)
-
-    def isRight(self) -> bool:
-        return isinstance(self, Right)
 
     def __eq__(self, other) -> bool:
 
@@ -136,14 +130,14 @@ class Right(Either):
     def fmap(self, func: Callable) -> "Right":
 
         # only callable
-        assert callable(func), AssertNotCallable()
+        assert callable(func), AssertNonCallable()
 
         return Right(func(self._value))
 
     def __mod__(self, either: Eithers) -> Eithers:
 
         # only callable
-        assert callable(self._value), AssertNotCallable()
+        assert callable(self._value), AssertNonCallable()
         # only Either
         assert isinstance(either, Either), AssertWrongArgumentType("Either")
 
@@ -152,7 +146,7 @@ class Right(Either):
     def __rshift__(self, func: Callable[..., Eithers]) -> Eithers:
 
         # only callable
-        assert callable(func), AssertNotCallable()
+        assert callable(func), AssertNonCallable()
 
         return func(self._value)
 
@@ -186,7 +180,7 @@ def rights(seq: Union[EitherCollection, EitherGenerator]) -> Tuple[Right, ...]:
 def either(func_left: Callable, func_right: Callable, left_right: Eithers) -> Any:
 
     # only callable
-    assert callable(func_left) and callable(func_right), AssertNotCallable()
+    assert callable(func_left) and callable(func_right), AssertNonCallable()
     # only Either
     assert isinstance(left_right, Either), AssertWrongArgumentType(
         "Either")
@@ -221,3 +215,18 @@ def fromRight(alternative: Any, either: Eithers) -> Any:
         str(type(either._value)))
 
     return either._value if isinstance(either, Right) else alternative
+
+
+@enrichFunction
+def isLeft(either: Eithers) -> bool:
+
+    # only Either
+    assert isinstance(either, Either), AssertWrongArgumentType(
+        "Either")
+
+    return isinstance(either, Left)
+
+
+@enrichFunction
+def isRight(either: Eithers) -> bool:
+    return not isLeft(either)
