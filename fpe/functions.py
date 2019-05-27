@@ -5,7 +5,7 @@ from functools import reduce
 from typing import Any, Callable, Dict, Tuple, Union
 
 from fpe.asserts import (AssertCurringError, AssertFunctionCompositionError,
-                         AssertFunctionWrappingError, AssertNotCallable,
+                         AssertFunctionWrappingError, AssertNonCallable,
                          AssertWrongArgumentType, AssertWrongType)
 
 
@@ -21,7 +21,7 @@ def _is_variable(func: Callable) -> bool:
     "Checking if function has variable arguments of any kind"
 
     # only callable
-    assert callable(func), AssertNotCallable()
+    assert callable(func), AssertNonCallable()
     # only non builtin
     assert func not in _unknown_builtin, AssertWrongArgumentType(
         "builtin functions or methods are not supported")
@@ -41,7 +41,7 @@ def _get_defaults(func: Callable) -> Tuple[Any, ...]:
     """
 
     # only callable
-    assert callable(func), AssertNotCallable()
+    assert callable(func), AssertNonCallable()
     # only non builtin
     assert func not in _unknown_builtin, AssertWrongArgumentType(
         "builtin functions or methods are not supported")
@@ -58,7 +58,7 @@ def _is_defaults(func: Callable) -> bool:
     """
 
     # only callable
-    assert callable(func), AssertNotCallable()
+    assert callable(func), AssertNonCallable()
     # only non builtin
     assert func not in _unknown_builtin, AssertWrongArgumentType(
         "builtin functions or methods are not supported")
@@ -74,7 +74,7 @@ def _get_arg_count(func: Callable) -> int:
     Similar to func.__code__.co_argcount
     """
     # only callable
-    assert callable(func), AssertNotCallable()
+    assert callable(func), AssertNonCallable()
     # only non builtin
     assert func not in _unknown_builtin, AssertWrongArgumentType(
         "builtin functions or methods are not supported")
@@ -93,7 +93,7 @@ def _func_to_tuple(func: Callable) -> Tuple[Callable, ...]:
     """
 
     # only callable
-    assert callable(func), AssertNotCallable()
+    assert callable(func), AssertNonCallable()
 
     if isinstance(func, FunctionComposition):
         result: Tuple[Callable, ...] = func.func
@@ -111,7 +111,7 @@ def is_curried(func: Callable) -> bool:
     # checking if function is curried function
 
     # only callable
-    assert callable(func), AssertNotCallable()
+    assert callable(func), AssertNonCallable()
 
     return getattr(func, "is_curried", False)
 
@@ -242,7 +242,7 @@ class CurriedFunctionPositionals(Function):
     def __init__(self, func: Callable):
 
         # only callable
-        assert callable(func), AssertNotCallable()
+        assert callable(func), AssertNonCallable()
         # only non builtin
         assert (func not in _unknown_builtin) and (not inspect.isbuiltin(func)), AssertCurringError(
             "builtin functions or methods are not supported")
@@ -297,7 +297,7 @@ class CurriedFunctionDefaults(Function):
     def __init__(self, func: Callable):
 
         # only callable
-        assert callable(func), AssertNotCallable()
+        assert callable(func), AssertNonCallable()
         # only non builtin
         assert (func not in _unknown_builtin) and (not inspect.isbuiltin(func)), AssertCurringError(
             "builtin functions or methods are not supported")
@@ -400,31 +400,31 @@ class CurriedFunctionFixedArgumentsNumber(Function):
     Keyword arguments are not handled until that. Check following
     examples, for better understanding:
 
-        f = curry(3)func(a, b, x=0); f(1, 2) #  will not work, due lack of positionals
-        f = curry(3)func(a, b, x=0); f(1, 2, x=10) #  will not work, due lack of positionals
-        f = curry(3)func(a, b, x=0); f(1, 2, 10) #  will work
-        f = curry(2)func(a, b, c, x=0); f(1)(2, 3) #  will not work, due wrong number of fixed
-        f = curry(3)func(a, b, c, x=0); f(1, 2)(3) #  will work
-        f = curry(3)func(a, b, c, x=0); f(1)(2, 3, x=10) #  will work
-        f = curry(3)func(a, b, c, x=0); f(1, 2)(3, 10) #  will work
-        f = curry(3)func(a, b, c, x=0, y=1); f(1, 2)(3, 10) #  will work
-        f = curry(3)func(a, b, c, x=0, y=1); f(1, 2)(3, 10)(11) #  will work
-        f = curry(3)func(x=0, y=1, z=2); f() #  will not work, due lack of positionals
-        f = curry(3)func(x=0, y=1, z=2); f(1, 2) #  will not work, due lack of positionals
-        f = curry(3)func(x=0, y=1, z=2); f(1, 2, 3) #  will work
-        f = curry(3)func(*args); f(1, 2, 3) #  will work
-        f = curry(3)func(*args); f(1, 2) #  will not work, due lack of positionals
-        f = curry(3)func(a, *args); f(1, 2, 3) #  will work
-        f = curry(3)func(a, b, *args); f(1, 2, 3) #  will work
-        f = curry(3)func(a, b, *args); f(1, 2)(3, 4)(5) #  will work
-        f = curry(3)func(a, b, *args, x=0); f(1)(2, 3, x=10) #  will work
-        f = curry(2)func(a, *args, x=0); f(1, x=10) #  will not work, due lack of positionals
+        f = staticCurry(3)(func(a, b, x=0)); f(1, 2) #  will not work, due lack of positionals
+        f = staticCurry(3)(func(a, b, x=0)); f(1, 2, x=10) #  will not work, due lack of positionals
+        f = staticCurry(3)(func(a, b, x=0)); f(1, 2, 10) #  will work
+        f = staticCurry(2)(func(a, b, c, x=0)); f(1)(2, 3) #  will not work, due wrong number of fixed
+        f = staticCurry(3)(func(a, b, c, x=0)); f(1, 2)(3) #  will work
+        f = staticCurry(3)(func(a, b, c, x=0)); f(1)(2, 3, x=10) #  will work
+        f = staticCurry(3)(func(a, b, c, x=0)); f(1, 2)(3, 10) #  will work
+        f = staticCurry(3)(func(a, b, c, x=0, y=1)); f(1, 2)(3, 10) #  will work
+        f = staticCurry(3)(func(a, b, c, x=0, y=1)); f(1, 2)(3, 10)(11) #  will work
+        f = staticCurry(3)(func(x=0, y=1, z=2)); f() #  will not work, due lack of positionals
+        f = staticCurry(3)(func(x=0, y=1, z=2)); f(1, 2) #  will not work, due lack of positionals
+        f = staticCurry(3)(func(x=0, y=1, z=2)); f(1, 2, 3) #  will work
+        f = staticCurry(3)(func(*args)); f(1, 2, 3) #  will work
+        f = staticCurry(3)(func(*args)); f(1, 2) #  will not work, due lack of positionals
+        f = staticCurry(3)(func(a, *args)); f(1, 2, 3) #  will work
+        f = staticCurry(3)(func(a, b, *args)); f(1, 2, 3) #  will work
+        f = staticCurry(3)(func(a, b, *args)); f(1, 2)(3, 4)(5) #  will work
+        f = staticCurry(3)(func(a, b, *args, x=0)); f(1)(2, 3, x=10) #  will work
+        f = staticCurry(2)(func(a, *args, x=0)); f(1, x=10) #  will not work, due lack of positionals
     """
 
     def __init__(self, num: int, func: Callable):
 
         # only callable
-        assert callable(func), AssertNotCallable()
+        assert callable(func), AssertNonCallable()
         # wrong arguments number
         assert num > 1, AssertFunctionWrappingError(
             "number of arguments has to be at least 2")
@@ -481,7 +481,7 @@ class FunctionComposition(Function):
     def __init__(self, func1: Callable, func2: Callable):
 
         # only callable
-        assert callable(func1) and callable(func2), AssertNotCallable()
+        assert callable(func1) and callable(func2), AssertNonCallable()
 
         self._func: Tuple[Callable, ...] = _func_to_tuple(func1) + _func_to_tuple(func2)
 
@@ -512,7 +512,7 @@ class FunctionEnrichment(Function):
     def __init__(self, func: Callable):
 
         # only callable
-        assert callable(func), AssertNotCallable()
+        assert callable(func), AssertNonCallable()
 
         self._func: Callable = func
         self._copy_meta()
@@ -531,7 +531,7 @@ def _curry_common(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunct
     """
 
     # only callable
-    assert callable(func), AssertNotCallable()
+    assert callable(func), AssertNonCallable()
     # only non builtin
     assert (func not in _unknown_builtin) and (not inspect.isbuiltin(func)), AssertCurringError(
         "builtin functions or methods are not supported")
@@ -555,11 +555,25 @@ def _curry_common(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunct
     return curried
 
 
-@_curry_common
-def _curry_fixed(num: int, func: Callable) -> CurriedFunctionFixedArgumentsNumber:
-    """Curring function for functions with given number of positional arguments
+def curry(func: Callable) -> Union[CurriedFunctionDefaults, CurriedFunctionPositionals]:
+    """Decorator for curring function of at least 2 arguments.
 
-    Thus curry(3)(f)(x)(y, z) == curry(3)(f)(x, y)(z) == f(x, y, z)
+    Thus:
+        for positionals: curry(f)(x)(y, z) == curry(f)(x, y)(z) == f(x, y, z)
+        for defaults: curry(f)(x)(y=5, z=10) == curry(f)(x, y=5) == f(x, y=5, z=10)
+    """
+
+    # only callable
+    assert callable(func), AssertCurringError("curry decorator passes only callable")
+
+    return _curry_common(func)
+
+
+@curry
+def _curry_fixed(num: int, func: Callable) -> CurriedFunctionFixedArgumentsNumber:
+    """Curring function for functions with given number of positional arguments.
+
+    Thus, staticCurry(3)(f)(x)(y, z) == staticCurry(3)(f)(x, y)(z) == f(x, y, z)
     """
 
     curried = CurriedFunctionFixedArgumentsNumber(num, func)
@@ -575,26 +589,21 @@ def _curry_fixed(num: int, func: Callable) -> CurriedFunctionFixedArgumentsNumbe
     return curried
 
 
-def curry(func_or_num: Union[int, Callable]) -> Union[CurriedFunctionDefaults,
-                                                    CurriedFunctionPositionals,
-                                                    CurriedFunctionFixedArgumentsNumber]:
-    """Decorator for curring function of at least 2 arguments
+def staticCurry(args_num: int) -> CurriedFunctionFixedArgumentsNumber:
+    """Decorator for static curring function of at least 2 arguments.
+
+    It serves for curring builtins and functions with variable number of
+    positional and key value arguments.
 
     Thus:
-        for positionals: curry(f)(x)(y, z) == curry(f)(x, y)(z) == f(x, y, z)
-        for defaults: curry(f)(x)(y=5, z=10) == curry(f)(x, y=5) == f(x, y=5, z=10)
-        for fixed arguments number: curry(3)(f)(x)(y, z) == curry(3)(f)(x, y)(z) == f(x, y, z)
+        staticCurry(3)(f)(x)(y, z) == staticCurry(3)(f)(x, y)(z) == f(x, y, z)
     """
 
-    # only callable
-    assert callable(func_or_num) or isinstance(
-        func_or_num, int), AssertCurringError(
-            "curry decorator passes only callable or number of fixed arguments")
+    # only positive int > 1
+    assert isinstance(args_num, int) and args_num > 1, AssertCurringError(
+        "number of fixed arguments has to be equal or more that 2")
 
-    if isinstance(func_or_num, int):
-        return _curry_fixed(func_or_num)
-
-    return _curry_common(func_or_num)
+    return _curry_fixed(args_num)
 
 
 def enrichFunction(func):

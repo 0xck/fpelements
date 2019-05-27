@@ -3,13 +3,13 @@ from typing import Any, Callable, Iterable, NoReturn, Union, Tuple
 
 from fpe.base import flip
 from fpe.builtins import map_, zip_
-from fpe.functions import curry
+from fpe.functions import curry, staticCurry
 
 
-dropWhile = curry(2)(dropwhile)
+dropWhile = staticCurry(2)(dropwhile)
 dropWhile.__doc__ = "The same as itertools.dropwhile but curried."
 
-takeWhile = curry(2)(takewhile)
+takeWhile = staticCurry(2)(takewhile)
 takeWhile.__doc__ = "The same as itertools.takewhile but curried."
 
 
@@ -27,7 +27,7 @@ def drop(num: int, iterable: Iterable) -> Union[Iterable, NoReturn]:
     return islice(iterable, num, None)
 
 
-accumulate_ = curry(2)(flip(accumulate))
+accumulate_ = staticCurry(2)(flip(accumulate))
 accumulate_.__doc__ = """Curried version of itertools.accumulate.
 
 accumulate_ retracts 1st as function that will be applied on items
@@ -35,7 +35,7 @@ and waiting for iterable.
 Literally accumulate(iterable, func)
 """
 
-zipWith = curry(3)(map)
+zipWith = staticCurry(3)(map)
 zipWith.__doc__ = """Curried builtin map for at least 2 iterables.
 
 zipWith retracts 1st as function that will be applied on items,
@@ -47,7 +47,7 @@ But works with any number of iterables, as map does.
 """
 
 
-@curry(3)
+@staticCurry(3)
 def zipPad(pad: Any, iterable: Iterable, *args: Iterable) -> Union[Iterable, NoReturn]:
     """Curried zip_longest.
 
@@ -59,7 +59,7 @@ def zipPad(pad: Any, iterable: Iterable, *args: Iterable) -> Union[Iterable, NoR
     return zip_longest(iterable, *args, fillvalue=pad)
 
 
-@curry(4)
+@staticCurry(4)
 def zipWithPad(func: Callable, pad: Any, iterable: Iterable, *args: Iterable) -> Union[Iterable, NoReturn]:
     """Curried zip_longest, where given function is applied on every item.
 

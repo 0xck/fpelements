@@ -6,7 +6,7 @@ from hypothesis import given, assume
 
 from fpe.functions import (CurriedFunctionFixedArgumentsNumber,
                            CurriedFunctionDefaults, CurriedFunctionPositionals,
-                           curry)
+                           curry, staticCurry)
 
 from .stuff import bin_op_cmp, bin_op_log, bin_op_math, known_builtins, minus_, mul_, plus_
 
@@ -46,7 +46,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_positional_fixed(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(x, y, z, a, b):
             return ((x - (y + z)) * a) - b
 
@@ -91,7 +91,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_args0_fixed(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(*args):
             return ((x - (y + z)) * a) - b
 
@@ -136,7 +136,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_args1_fixed(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(x, *args):
             return ((x - (y + z)) * a) - b
 
@@ -181,7 +181,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_args2_fixed(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(x, y, *args):
             return ((x - (y + z)) * a) - b
 
@@ -226,7 +226,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_args3_fixed(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(x, y, z, *args):
             return ((x - (y + z)) * a) - b
 
@@ -271,7 +271,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_args4_fixed(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(x, y, z, a, *args):
             return ((x - (y + z)) * a) - b
 
@@ -316,7 +316,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_positional_fixed_kwargs(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(x, y, z, a, b, **kwags):
             return ((x - (y + z)) * a) - b
 
@@ -361,7 +361,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_args0_fixed_kwargs(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(*args, **kwags):
             return ((x - (y + z)) * a) - b
 
@@ -406,7 +406,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_args1_fixed_kwargs(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(x, *args, **kwags):
             return ((x - (y + z)) * a) - b
 
@@ -451,7 +451,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_args2_fixed_kwargs(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(x, y, *args, **kwags):
             return ((x - (y + z)) * a) - b
 
@@ -496,7 +496,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_args3_fixed_kwargs(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(x, y, z, *args, **kwags):
             return ((x - (y + z)) * a) - b
 
@@ -541,7 +541,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_args4_fixed_kwargs(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(x, y, z, a, *args, **kwags):
             return ((x - (y + z)) * a) - b
 
@@ -608,7 +608,7 @@ class TestCurrying(TestCase):
 
         result = ((x - (y + z)) * a) - b
 
-        @curry(5)
+        @staticCurry(5)
         def func(x=0, y=0, z=0, a=0, b=0):
             return ((x - (y + z)) * a) - b
 
@@ -617,7 +617,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_defaults_args_fixed(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(*args, x=0, y=0, z=0, a=0, b=0):
             return ((x - (y + z)) * a) - b
 
@@ -626,7 +626,7 @@ class TestCurrying(TestCase):
     @given(*(st.integers() for _ in range(5)))
     def test_currying_defaults_args_fixed_kwargs(self, x, y, z, a, b):
 
-        @curry(5)
+        @staticCurry(5)
         def func(*args, x=0, y=0, z=0, a=0, b=0, **kwargs):
             return ((x - (y + z)) * a) - b
 
@@ -662,7 +662,7 @@ class TestCurrying(TestCase):
     def test_currying_class_mtd_positional_fixed(self, x, y, z, a, b):
 
         class C:
-            @curry(6)
+            @staticCurry(6)
             def func(self, x, y, z, a, b):
                 return ((x - (y + z)) * a) - b
 
@@ -736,7 +736,7 @@ class TestCurrying(TestCase):
         result = ((x - (y + z)) * a) - b
 
         class C:
-            @curry(6)
+            @staticCurry(6)
             def func(self, x=0, y=0, z=0, a=0, b=0):
                 return ((x - (y + z)) * a) - b
 
@@ -805,47 +805,47 @@ class TestCurrying(TestCase):
     def test_curring_fixed_errors(self, x):
 
         with self.assertRaises(AssertionError):
-            @curry(x)
+            @staticCurry(x)
             def func(*args):
                 pass
 
         with self.assertRaises(AssertionError):
-            @curry(x)
+            @staticCurry(x)
             def func(x, y, *args):
                 pass
 
         with self.assertRaises(AssertionError):
-            @curry(x)
+            @staticCurry(x)
             def func(x, y=0, *args):
                 pass
 
         with self.assertRaises(AssertionError):
-            @curry(x)
+            @staticCurry(x)
             def func(**kwags):
                 pass
 
         with self.assertRaises(AssertionError):
-            @curry(x)
+            @staticCurry(x)
             def func(x, y, **kwags):
                 pass
 
         with self.assertRaises(AssertionError):
-            @curry(x)
+            @staticCurry(x)
             def func(x, y=0, **kwags):
                 pass
 
         with self.assertRaises(AssertionError):
-            @curry(x)
+            @staticCurry(x)
             def func(*args, **kwags):
                 pass
 
         with self.assertRaises(AssertionError):
-            @curry(x)
+            @staticCurry(x)
             def func(x, y, *args, **kwags):
                 pass
 
         with self.assertRaises(AssertionError):
-            @curry(x)
+            @staticCurry(x)
             def func(x, y=0, *args, **kwags):
                 pass
 
@@ -854,7 +854,7 @@ class TestCurrying(TestCase):
 
         for f in bin_op_cmp+bin_op_log:
 
-            cf = curry(2)(f)
+            cf = staticCurry(2)(f)
             result = f(x, y)
 
             self.assertEqual(cf(x, y), result)
@@ -865,7 +865,7 @@ class TestCurrying(TestCase):
 
         for f in bin_op_math[:-1]:
 
-            cf = curry(2)(f)
+            cf = staticCurry(2)(f)
             result = f(x, y)
 
             self.assertEqual(cf(x, y), result)
@@ -893,12 +893,12 @@ class TestCurrying(TestCase):
         for f in known_builtins:
 
             self.assertIsInstance(
-                curry(x)(f), CurriedFunctionFixedArgumentsNumber)
+                staticCurry(x)(f), CurriedFunctionFixedArgumentsNumber)
 
         for f in (minus_, mul_, plus_):
 
             self.assertIsInstance(
-                curry(2)(f), CurriedFunctionFixedArgumentsNumber)
+                staticCurry(2)(f), CurriedFunctionFixedArgumentsNumber)
 
     @given(st.integers(min_value=2, max_value=128), st.integers(max_value=1))
     def test_curring_classes_fixed_error(self, x, y):
