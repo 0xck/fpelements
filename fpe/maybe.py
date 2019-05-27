@@ -105,7 +105,9 @@ class Nothing_(Maybe):
     there is the class' object with name Nothing, which have to
     used in code as representation computation failure.
     E. g. 1/0 = Nothing, not 1/0 = Nothing_(). For class checking
-    also use Nothing_, e.g. isinstance(Nothing, Nothing_)
+    also use Nothing_, e.g. isinstance(Nothing, Nothing_). Also
+    the better would be using isNothing(maybe) function or
+    `is` operator, e.g. obj is Nothing.
     Note.
         Nothing is object of Nothing_, but is not really singleton,
         anyway you do not need to create more Nothing_ objects.
@@ -174,3 +176,21 @@ class Just(Maybe):
 
 # defined Nonthing
 Nothing = Nothing_()
+
+
+@enrichFunction
+def isNothing(maybe: Maybies) -> bool:
+
+    assert isinstance(maybe, Maybe), AssertWrongArgumentType(
+        "Maybe")
+
+    return maybe is Nothing
+
+
+@enrichFunction
+def isJust(maybe: Maybies) -> bool:
+
+    assert isinstance(maybe, Maybe), AssertWrongArgumentType(
+        "Maybe")
+
+    return isinstance(maybe, Just)
