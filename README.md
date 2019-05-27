@@ -11,8 +11,8 @@ Small set of functional programming tools for python, inspired by _haskell_.
 ## Installation
 Go to `fpelements` directory and execute:
 
-* `python setup.py sdist`
 * `pip install -r requirements/base.txt`
+* `python setup.py sdist`
 * `pip install dist/fpe-<version>.tar.gz`
 
 > Note. Python 3 is required.
