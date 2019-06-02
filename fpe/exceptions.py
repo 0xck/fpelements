@@ -1,4 +1,6 @@
-from fpe.either import Left, Right
+from typing import NoReturn, Union
+
+from fpe.either import Left, Right, Eithers
 from fpe.asserts import AssertNonCallable
 from fpe.functions import enrichFunction
 
@@ -8,7 +10,7 @@ FATAL_EXCEPTIONS = (AssertionError, EOFError, GeneratorExit, ImportError, Keyboa
 
 
 @enrichFunction
-def try_(func_or_obj, *args, **kwargs):
+def try_(func_or_obj, *args, **kwargs) -> Union[Eithers, NoReturn]:
     """Function for safely handling 'non-fatal' exceptions.
 
     Function takes first argument as possible callable or any object,
@@ -35,8 +37,7 @@ def try_(func_or_obj, *args, **kwargs):
     """
 
     assert callable(func_or_obj) or (
-            not callable(func_or_obj) and not (bool(args) or bool(kwargs))), AssertNonCallable(
-                "Can not handle non-callable object with arguments.")
+            not callable(func_or_obj) and not (bool(args) or bool(kwargs))), AssertNonCallable()
 
     if not callable(func_or_obj):
         return Right(func_or_obj)
