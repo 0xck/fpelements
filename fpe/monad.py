@@ -7,7 +7,7 @@ from fpe.applicative import AbstractApplicative
 class AbstractMonad(AbstractApplicative):
 
     @abstractmethod
-    def __rshift__(self, func: Callable):
+    def __rshift__(self, func: Callable) -> "AbstractMonad":
         """
         Sequentially compose two actions, passing any value produced by the first as an argument to the second.
 
@@ -18,7 +18,12 @@ class AbstractMonad(AbstractApplicative):
                 m >>= pure = m
                 m >>= (\\x -> k x >>= h) = (m >>= k) >>= h
 
-            This is not possible to satisfy these laws in some automatical way,
+            This is not possible to satisfy these laws in some automatic way,
             implementation should be performed manually.
         """
         pass
+
+    def bind(self, func: Callable) -> "AbstractMonad":
+        """Explicit >>= method."""
+
+        return self.__rshift__(func)
