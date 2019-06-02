@@ -20,13 +20,13 @@ class TestComposition(TestCase):
         m_composed = (mul(x) * minus(x) * plus(x))
         self.assertEqual(m_composed(y), result)
 
-        p_composed = (plus(x) | minus(x) | mul(x))
+        p_composed = (plus(x) / minus(x) / mul(x))
         self.assertEqual(p_composed(y), result)
 
-        fm_composed = compose(minus(x), plus(x)) | mul(x)
+        fm_composed = compose(minus(x), plus(x)) / mul(x)
         self.assertEqual(fm_composed(y), result)
 
-        fp_composed = pipe(plus(x), minus(x)) | mul(x)
+        fp_composed = pipe(plus(x), minus(x)) / mul(x)
         self.assertEqual(fp_composed(y), result)
 
     @given(st.integers(), st.integers())
@@ -36,8 +36,8 @@ class TestComposition(TestCase):
         m_composed2 = mul(x) * (minus(x) * plus(x))
         self.assertEqual(m_composed1(y), m_composed2(y))
 
-        p_composed1 = plus(x) | (minus(x) | mul(x))
-        p_composed2 = (plus(x) | minus(x)) | mul(x)
+        p_composed1 = plus(x) / (minus(x) / mul(x))
+        p_composed2 = (plus(x) / minus(x)) / mul(x)
         self.assertEqual(p_composed1(y), p_composed2(y))
 
         fm_composed1 = compose(compose(mul(x), minus(x)), plus(x))
@@ -55,8 +55,8 @@ class TestComposition(TestCase):
 
         self.assertEqual((id_ * minus(x))(y), result)
         self.assertEqual((minus(x) * id_)(y), result)
-        self.assertEqual((minus(x) | id_)(y), result)
-        self.assertEqual((id_ | minus(x))(y), result)
+        self.assertEqual((minus(x) / id_)(y), result)
+        self.assertEqual((id_ / minus(x))(y), result)
         self.assertEqual(compose(minus(x), id_)(y), result)
         self.assertEqual(compose(id_, minus(x))(y), result)
         self.assertEqual(pipe(minus(x), id_)(y), result)
@@ -74,8 +74,8 @@ class TestComposition(TestCase):
             self.assertEqual((id_ * f)(x), result)
             self.assertEqual((f * id_)(x), result)
 
-            self.assertEqual((id_ | f)(x), result)
-            self.assertEqual((f | id_)(x), result)
+            self.assertEqual((id_ / f)(x), result)
+            self.assertEqual((f / id_)(x), result)
 
             self.assertEqual(compose(f, id_)(x), result)
             self.assertEqual(compose(id_, f)(x), result)
@@ -89,8 +89,8 @@ class TestComposition(TestCase):
             self.assertEqual((id_ * f)(s), result)
             self.assertEqual((f * id_)(s), result)
 
-            self.assertEqual((id_ | f)(s), result)
-            self.assertEqual((f | id_)(s), result)
+            self.assertEqual((id_ / f)(s), result)
+            self.assertEqual((f / id_)(s), result)
 
             self.assertEqual(compose(f, id_)(s), result)
             self.assertEqual(compose(id_, f)(s), result)
@@ -109,14 +109,14 @@ class TestComposition(TestCase):
         self.assertIsInstance((plus_ * id_), FunctionComposition)
         self.assertIsInstance((id_ * id_), FunctionComposition)
 
-        self.assertIsInstance((plus | minus), FunctionComposition)
-        self.assertIsInstance((plus | minus_), FunctionComposition)
-        self.assertIsInstance((plus_ | minus), FunctionComposition)
-        self.assertIsInstance((id_ | minus), FunctionComposition)
-        self.assertIsInstance((plus | id_), FunctionComposition)
-        self.assertIsInstance((id_ | minus_), FunctionComposition)
-        self.assertIsInstance((plus_ | id_), FunctionComposition)
-        self.assertIsInstance((id_ | id_), FunctionComposition)
+        self.assertIsInstance((plus / minus), FunctionComposition)
+        self.assertIsInstance((plus / minus_), FunctionComposition)
+        self.assertIsInstance((plus_ / minus), FunctionComposition)
+        self.assertIsInstance((id_ / minus), FunctionComposition)
+        self.assertIsInstance((plus / id_), FunctionComposition)
+        self.assertIsInstance((id_ / minus_), FunctionComposition)
+        self.assertIsInstance((plus_ / id_), FunctionComposition)
+        self.assertIsInstance((id_ / id_), FunctionComposition)
 
         self.assertIsInstance(compose(plus, minus), FunctionComposition)
         self.assertIsInstance(compose(plus, minus_), FunctionComposition)

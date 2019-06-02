@@ -10,7 +10,7 @@ class AbstractFunctor(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def fmap(self, func: Callable) -> Any:
+    def __or__(self, func: Callable) -> "AbstractFunctor":
         """fmap function for mapping values with functions
 
         Borrowed from fmap :: (a -> b) -> f a -> f b
@@ -25,6 +25,11 @@ class AbstractFunctor(metaclass=ABCMeta):
             implementation should be performed manually.
         """
         pass
+
+    def fmap(self, func: Callable) -> "AbstractFunctor":
+        """Explicit fmap method."""
+
+        return self.__or__(func)
 
 
 @curry

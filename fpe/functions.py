@@ -8,17 +8,16 @@ from fpe.asserts import (AssertCurringError, AssertFunctionCompositionError,
                          AssertFunctionWrappingError, AssertNonCallable,
                          AssertWrongArgumentType, AssertWrongType)
 
-
 # inspect.isbuiltin does not work for all built-ins
 # see https://bugs.python.org/issue23525
 _unknown_builtin = (dict, help, slice, object, enumerate, staticmethod, int, str,
-    bool, bytearray, filter, super, bytes, float, tuple, property, type,
-    frozenset, list, range, classmethod, zip, map, reversed, complex,
-    memoryview, set)
+                    bool, bytearray, filter, super, bytes, float, tuple, property, type,
+                    frozenset, list, range, classmethod, zip, map, reversed, complex,
+                    memoryview, set)
 
 
 def _is_variable(func: Callable) -> bool:
-    "Checking if function has variable arguments of any kind"
+    """Checking if function has variable arguments of any kind"""
 
     # only callable
     assert callable(func), AssertNonCallable()
@@ -102,7 +101,7 @@ def _func_to_tuple(func: Callable) -> Tuple[Callable, ...]:
         assert isinstance(result, tuple), AssertWrongType(str(type(result)), str(tuple()))
 
     else:
-        result: Tuple[Callable, ...] = (func, )
+        result: Tuple[Callable, ...] = (func,)
 
     return result
 
@@ -120,7 +119,7 @@ class Function(metaclass=ABCMeta):
     """Abstract class for representation advanced function features
 
     Function serves as base class for currying and function composition.
-    It provides redefined * and | methods for supporting function
+    It provides redefined * and / methods for supporting function
     composition syntax.
     """
 
@@ -175,7 +174,8 @@ class Function(metaclass=ABCMeta):
         #   composition.func == (f1, f2, f3, f4, func2), so that it is compared like
         #   composition.func == func1.func + (func2, ) or
         #   (f1, f2, f3, f4, func2) == (f1, f2, f3, f4) + (func2, )
-        assert composed.func == reduce(lambda acc, x: acc + _func_to_tuple(x), (func1, func2), tuple()), AssertFunctionCompositionError(
+        assert composed.func == reduce(lambda acc, x: acc + _func_to_tuple(x), (func1, func2),
+                                       tuple()), AssertFunctionCompositionError(
             "composition does not contain given functions or has them in wrong order")
 
         return composed
@@ -198,8 +198,8 @@ class Function(metaclass=ABCMeta):
 
         return self._compose(self, other)
 
-    def __or__(self, other: Callable) -> "FunctionComposition":
-        """Pipe-style composition method: (f | g) = g(f) for left argument
+    def __truediv__(self, other: Callable) -> "FunctionComposition":
+        """Pipe-style composition method: (f / g) = g(f) for left argument
 
         Useful when left argument is Function obj and right is any callable.
         Reversed composition borrowed from (flip (.)) :: (a -> b) -> (b -> c) -> a -> c
@@ -207,8 +207,8 @@ class Function(metaclass=ABCMeta):
 
         return self.__rmul__(other)
 
-    def __ror__(self, other: Callable) -> "FunctionComposition":
-        """Pipe-style composition method: (f | g) = g(f) for right argument
+    def __rtruediv__(self, other: Callable) -> "FunctionComposition":
+        """Pipe-style composition method: (f / g) = g(f) for right argument
 
         Useful when left argument is not Function obj, but callable and right is Function obj.
         Reversed composition borrowed from (flip (.)) :: (a -> b) -> (b -> c) -> a -> c
@@ -217,7 +217,6 @@ class Function(metaclass=ABCMeta):
         return self.__mul__(other)
 
     def _copy_meta(self, defaults=("Unknown", None, None, None)):
-
         # assign some meta
         self.__name__ = "Wrapped: <{}>".format(
             getattr(self._func, "__name__", defaults[0]))
@@ -226,7 +225,6 @@ class Function(metaclass=ABCMeta):
         self.__qualname__ = getattr(self._func, "__qualname__", defaults[3])
 
     def __repr__(self):
-
         return "{}, retracted: function <{}>, number of arguments <{}>".format(
             self.__class__.__name__, self._func, self.retracted)
 
@@ -240,7 +238,6 @@ class CurriedFunctionPositionals(Function):
     """
 
     def __init__(self, func: Callable):
-
         # only callable
         assert callable(func), AssertNonCallable()
         # only non builtin
@@ -274,7 +271,6 @@ class CurriedFunctionPositionals(Function):
         return True
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
-
         # check if all arguments were retracted
         # if yes, then return original function
         if (len(self._args) + len(args)) >= self._original_arg_count:
@@ -365,7 +361,6 @@ class CurriedFunctionDefaults(Function):
         # but less than all possible arguments, then
         # borrow necessary from defaults
         if (num_args > (self._original_arg_count - len(self._original_defaults))):
-
             defaults: Dict[str, Any] = OrderedDict(
                 (k, kw[k]) for k in tuple(kw)[-(self._original_arg_count - num_args):])
 
@@ -422,7 +417,6 @@ class CurriedFunctionFixedArgumentsNumber(Function):
     """
 
     def __init__(self, num: int, func: Callable):
-
         # only callable
         assert callable(func), AssertNonCallable()
         # wrong arguments number
@@ -447,7 +441,6 @@ class CurriedFunctionFixedArgumentsNumber(Function):
         return True
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
-
         # check if all arguments were retracted
         # if yes, then return original function
         if (len(self._args) + len(args)) >= self._original_arg_count:
@@ -479,7 +472,6 @@ class FunctionComposition(Function):
     """
 
     def __init__(self, func1: Callable, func2: Callable):
-
         # only callable
         assert callable(func1) and callable(func2), AssertNonCallable()
 
@@ -493,7 +485,6 @@ class FunctionComposition(Function):
             "composition must contains only callable objects")
 
     def __call__(self, value: Any) -> Any:
-
         result = value
 
         for f in self._func:
@@ -501,16 +492,14 @@ class FunctionComposition(Function):
 
         return result
 
-        def __repr__(self):
-
-            return "{}, retracted: functions <{}>".format(self.__class__.__name__, self._func)
+    def __repr__(self):
+        return "{}, retracted: functions <{}>".format(self.__class__.__name__, self._func)
 
 
 class FunctionEnrichment(Function):
     """Helper class for enrichment any function with ability to composition"""
 
     def __init__(self, func: Callable):
-
         # only callable
         assert callable(func), AssertNonCallable()
 
@@ -518,7 +507,6 @@ class FunctionEnrichment(Function):
         self._copy_meta()
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
-
         return self._func(*args, **kwargs)
 
 

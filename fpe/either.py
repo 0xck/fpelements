@@ -20,7 +20,7 @@ class Either(AbstractMonad, AbstractSemigroup):
     In whole, class represents conception of handling computation
     that can not performed due some reason, e.g. domain of function
     might not be compatible its range, e.g. 1/0 can not be finished.
-    In this case result can not be retrived, but can be represented
+    In this case result can not be retrieved, but can be represented
     in some way. Here Right class contains finished computation, and
     Left class contains something that represents computation failure.
     E.g.
@@ -41,7 +41,7 @@ class Either(AbstractMonad, AbstractSemigroup):
     def pure(value: Any) -> Eithers:
         """Implementation of pure from ApplicativeFunctor.
 
-        Return value contexted by Right class.
+        Return value embraced by Right class.
         E.g.
             pure(42) == Right(42)
             pure(isinstance) = Right(isinstance)
@@ -57,7 +57,7 @@ class Either(AbstractMonad, AbstractSemigroup):
     def liftA2(func: Callable, either1: Eithers, either2: Eithers) -> Eithers:
         """Implementation of lift2 from ApplicativeFunctor.
 
-        It applies binary function to two Either contexted values.
+        It applies binary function to two Either embraced values.
         E.g.
             lift2(max, Right(1), Right(42)) == Right(42)
             lift2(max, Right(1), Left("ZeroDivision")) == Left("ZeroDivision")
@@ -69,7 +69,7 @@ class Either(AbstractMonad, AbstractSemigroup):
         # only Either
         assert isinstance(either1, Either) and isinstance(either2, Either), AssertWrongArgumentType("Either")
 
-        return either1.fmap(func) % either2
+        return (either1 | func) % either2
 
     @property
     def value(self) -> NoReturn:
@@ -89,7 +89,7 @@ class Either(AbstractMonad, AbstractSemigroup):
         return True
 
     def __repr__(self):
-        return "Either {}: <{}>".format(self.__class__.__name__, self._value)
+        return "{}: {}".format(self.__class__.__name__, self._value)
 
 
 class Left(Either):
@@ -101,7 +101,7 @@ class Left(Either):
     def __init__(self, value: Any):
         self._value = value
 
-    def fmap(self, _: Callable) -> "Left":
+    def __or__(self, _: Callable) -> "Left":
         return self
 
     def __mod__(self, _: Callable) -> "Left":
@@ -127,7 +127,7 @@ class Right(Either):
     def __init__(self, value: Any):
         self._value = value
 
-    def fmap(self, func: Callable) -> "Right":
+    def __or__(self, func: Callable) -> "Right":
 
         # only callable
         assert callable(func), AssertNonCallable()
@@ -141,7 +141,7 @@ class Right(Either):
         # only Either
         assert isinstance(either, Either), AssertWrongArgumentType("Either")
 
-        return either.fmap(self._value)
+        return either | self._value
 
     def __rshift__(self, func: Callable[..., Eithers]) -> Eithers:
 

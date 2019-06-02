@@ -19,7 +19,7 @@ class Maybe(AbstractMonad, AbstractSemigroup):
     In whole, class represents conception of handling computation
     that can not performed due some reason, e.g. domain of function
     might not be compatible its range, e.g. 1/0 can not be finished.
-    In this case result can not be retrived, but can be represented
+    In this case result can not be retrieved, but can be represented
     in some way. Here Just class contains finished computation, and
     Nothing class represents computation failure.
     E.g.
@@ -40,7 +40,7 @@ class Maybe(AbstractMonad, AbstractSemigroup):
     def pure(value: Any) -> Maybies:
         """Implementation of pure from ApplicativeFunctor.
 
-        Return value contexted by Just class.
+        Return value embraced by Just class.
         E.g.
             pure(42) == Just(42)
             pure(isinstance) = Just(isinstance)
@@ -56,7 +56,7 @@ class Maybe(AbstractMonad, AbstractSemigroup):
     def liftA2(func: Callable, maybe1: Maybies, maybe2: Maybies) -> Maybies:
         """Implementation of lift2 from ApplicativeFunctor.
 
-        It applies binary function to two Maybe contexted values.
+        It applies binary function to two Maybe embraced values.
         E.g.
             lift2(max, Just(1), Just(42)) == Just(42)
             lift2(max, Just(1), Nothing) == Nothing
@@ -68,7 +68,7 @@ class Maybe(AbstractMonad, AbstractSemigroup):
         # only Maybe
         assert isinstance(maybe1, Maybe) and isinstance(maybe2, Maybe), AssertWrongArgumentType("Maybe")
 
-        return maybe1.fmap(func) % maybe2
+        return (maybe1 | func) % maybe2
 
     @property
     def value(self) -> NoReturn:
@@ -93,15 +93,15 @@ class Maybe(AbstractMonad, AbstractSemigroup):
     def __repr__(self):
 
         if isinstance(self, Nothing_):
-            return "Maybe Nothing"
+            return "Nothing"
 
-        return "Maybe Just: <{}>".format(self._value)
+        return "Just: {}".format(self._value)
 
 
 class Nothing_(Maybe):
     """Nothing_ class for representation failed computation.
 
-    Name of this class is ending with undercore, because
+    Name of this class is ending with underscore, because
     there is the class' object with name Nothing, which have to
     used in code as representation computation failure.
     E. g. 1/0 = Nothing, not 1/0 = Nothing_(). For class checking
@@ -115,7 +115,7 @@ class Nothing_(Maybe):
     Borrowed from Nothing :: Maybe a
     """
 
-    def fmap(self, _: Callable) -> "Nothing_":
+    def __or__(self, _: Callable) -> "Nothing_":
         return self
 
     def __mod__(self, _: Callable) -> "Nothing_":
@@ -141,7 +141,7 @@ class Just(Maybe):
     def __init__(self, value: Any):
         self._value = value
 
-    def fmap(self, func: Callable) -> "Just":
+    def __or__(self, func: Callable) -> "Just":
 
         # only callable
         assert callable(func), AssertNonCallable()
@@ -155,7 +155,7 @@ class Just(Maybe):
         # only Maybe
         assert isinstance(maybe, Maybe), AssertWrongArgumentType("Maybe")
 
-        return maybe.fmap(self._value)
+        return maybe | self._value
 
     def __rshift__(self, func: Callable[..., Maybies]) -> Maybies:
 
