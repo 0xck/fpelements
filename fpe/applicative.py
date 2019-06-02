@@ -9,7 +9,7 @@ class AbstractApplicative(AbstractFunctor):
     """
 
     @staticmethod
-    @abstractstaticmethod
+    @abstractmethod
     def pure(value: Any):
         """Lift a value function.
 
@@ -18,7 +18,7 @@ class AbstractApplicative(AbstractFunctor):
         pass
 
     @abstractmethod
-    def __mod__(self, func: Callable):
+    def __mod__(self, func: Callable) -> "AbstractApplicative":
         """Sequential application function.
 
         Borrower from (<*>) :: f (a -> b) -> f a -> f b
@@ -36,8 +36,13 @@ class AbstractApplicative(AbstractFunctor):
         """
         pass
 
+    def apply(self, func: Callable) -> "AbstractApplicative":
+        """Explicit <*> method."""
+
+        return self.__mod__(func)
+
     @staticmethod
-    @abstractstaticmethod
+    @abstractmethod
     def liftA2(func: Callable, fa, fb):
         """Lift a binary function to actions.
 
