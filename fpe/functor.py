@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Any, Callable
 
 from fpe.asserts import AssertNonCallable, AssertWrongArgumentType
-from fpe.functions import curry
+from fpe.functions import curry, enrichFunction
 
 
 class AbstractFunctor(metaclass=ABCMeta):
@@ -26,6 +26,7 @@ class AbstractFunctor(metaclass=ABCMeta):
         """
         pass
 
+    @enrichFunction
     def fmap(self, func: Callable) -> "AbstractFunctor":
         """Explicit fmap method."""
 
@@ -33,13 +34,12 @@ class AbstractFunctor(metaclass=ABCMeta):
 
 
 @curry
-def fmap(func: Callable, instance) -> Any:
-    """Common fmap function"""
+def fmap(func: Callable, instance: AbstractFunctor) -> AbstractFunctor:
+    """Common fmap function."""
 
     # only callable
     assert callable(func), AssertNonCallable()
     # only Functor
-    assert isinstance(instance, AbstractFunctor), AssertWrongArgumentType(
-        "AbstractFunctor")
+    assert isinstance(instance, AbstractFunctor), AssertWrongArgumentType("AbstractFunctor")
 
-    return instance.fmap(func)
+    return instance | func

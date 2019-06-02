@@ -1,7 +1,10 @@
 from abc import abstractmethod
-from typing import Callable
+from typing import Callable, Any
+
+from fpe.asserts import AssertWrongArgumentType, AssertNonCallable
 
 from fpe.applicative import AbstractApplicative
+from fpe.functions import enrichFunction, curry
 
 
 class AbstractMonad(AbstractApplicative):
@@ -23,7 +26,20 @@ class AbstractMonad(AbstractApplicative):
         """
         pass
 
+    @enrichFunction
     def bind(self, func: Callable) -> "AbstractMonad":
         """Explicit >>= method."""
 
         return self.__rshift__(func)
+
+
+@curry
+def bind(func: Callable, instance: AbstractMonad) -> AbstractMonad:
+    """Common sequentially compose two actions function (>>=)."""
+
+    # only callable
+    assert callable(func), AssertNonCallable()
+    # only Monad
+    assert isinstance(instance, AbstractMonad), AssertWrongArgumentType("AbstractMonad")
+
+    return instance >> func

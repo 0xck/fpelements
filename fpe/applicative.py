@@ -1,6 +1,10 @@
 from abc import abstractmethod, abstractstaticmethod
 from typing import Any, Callable
 
+from fpe.asserts import AssertNonCallable, AssertWrongArgumentType
+
+from fpe.functions import enrichFunction, curry
+
 from fpe.functor import AbstractFunctor
 
 
@@ -18,7 +22,7 @@ class AbstractApplicative(AbstractFunctor):
         pass
 
     @abstractmethod
-    def __mod__(self, func: Callable) -> "AbstractApplicative":
+    def __mod__(self, instance: "AbstractApplicative") -> "AbstractApplicative":
         """Sequential application function.
 
         Borrower from (<*>) :: f (a -> b) -> f a -> f b
@@ -36,10 +40,11 @@ class AbstractApplicative(AbstractFunctor):
         """
         pass
 
-    def apply(self, func: Callable) -> "AbstractApplicative":
+    @enrichFunction
+    def apply(self, instance: "AbstractApplicative") -> "AbstractApplicative":
         """Explicit <*> method."""
 
-        return self.__mod__(func)
+        return self.__mod__(instance)
 
     @staticmethod
     @abstractmethod
@@ -50,3 +55,17 @@ class AbstractApplicative(AbstractFunctor):
         May be defined as liftA2 f x y = f <$> x <*> y
         """
         pass
+
+
+@curry
+def apply(pured_func: AbstractApplicative, instance: AbstractApplicative) -> AbstractApplicative:
+    """Common sequential application function (<*>)."""
+
+    # only Applicative
+    assert isinstance(pured_func, AbstractApplicative), AssertWrongArgumentType("AbstractApplicative")
+    # only callable
+    assert callable(pured_func._value), AssertNonCallable()
+    # only Applicative
+    assert isinstance(instance, AbstractApplicative), AssertWrongArgumentType("AbstractApplicative")
+
+    return pured_func % instance
