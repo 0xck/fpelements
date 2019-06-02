@@ -64,7 +64,7 @@ class Either(AbstractMonad, AbstractSemigroup):
             lift2(max, Left("ZeroDivision"), Right(42)) == Left("ZeroDivision")
         """
 
-        # only callabe
+        # only callable
         assert callable(func), AssertNonCallable()
         # only Either
         assert isinstance(either1, Either) and isinstance(either2, Either), AssertWrongArgumentType("Either")
