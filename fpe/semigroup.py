@@ -2,8 +2,7 @@ from abc import ABCMeta, abstractmethod
 
 
 class AbstractSemigroup(metaclass=ABCMeta):
-    """An abstract class which represents a Semigroup conception.
-    """
+    """An abstract class which represents a Semigroup conception."""
 
     @abstractmethod
     def __and__(self, other):
@@ -18,4 +17,3 @@ class AbstractSemigroup(metaclass=ABCMeta):
             implementation should be performed manually.
         """
         pass
-
