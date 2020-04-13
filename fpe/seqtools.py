@@ -50,10 +50,6 @@ def count(item: Any, sequence: Collection) -> Union[int, NoReturn]:
             count(1, mapping.values())  # 2
     """
 
-    # makes search faster
-    if item not in sequence:
-        return 0
-
     if isinstance(sequence, Sequence):
         return sequence.count(item)
 
