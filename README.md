@@ -1,12 +1,12 @@
 # fpelements
 
-Small set of functional programming tools for python, inspired by _haskell_.
+Small set of functional programming tools for python, inspired by _haskell_ and _scala_.
 
 [![Build Status](https://travis-ci.org/0xck/fpelements.svg?branch=master)](https://travis-ci.org/0xck/fpelements)
 [![Coverage Status](https://coveralls.io/repos/github/0xck/fpelements/badge.svg?branch=master)](https://coveralls.io/github/0xck/fpelements?branch=master)
 
 
-> _Project was made as attempt to know haskell and functional programming abstractions better and to try to apply them to python._
+> _Project was made as attempt to know haskell, scala and functional programming abstractions better and to try to apply them to python._
 
 ## Installation
 Go to `fpelements` directory and execute:

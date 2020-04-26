@@ -2,7 +2,7 @@
 fpelements
 ##########
 
-Small set of functional programming tools for python, inspired by *haskell*.
+Small set of functional programming tools for python, inspired by *haskell* and *scala*.
 
 
 .. note::
