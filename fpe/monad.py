@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Callable, Any
+from typing import Callable
 
 from fpe.asserts import AssertWrongArgumentType, AssertNonCallable
 

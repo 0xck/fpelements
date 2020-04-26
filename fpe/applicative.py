@@ -1,4 +1,4 @@
-from abc import abstractmethod, abstractstaticmethod
+from abc import abstractmethod
 from typing import Any, Callable
 
 from fpe.asserts import AssertNonCallable, AssertWrongArgumentType

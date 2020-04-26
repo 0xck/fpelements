@@ -15,7 +15,7 @@ Go to `fpelements` directory and execute:
 * `python setup.py sdist`
 * `pip install dist/fpe-<version>.tar.gz`
 
-> Note. Python 3 is required.
+> Note. Python 3.5 is required.
 
 ---
 [![Repo on GitHub](https://img.shields.io/badge/repo-GitHub-3D76C2.svg)](https://github.com/0xck/fpelements)

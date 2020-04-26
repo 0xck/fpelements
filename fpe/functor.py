@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Callable
+from typing import Callable
 
 from fpe.asserts import AssertNonCallable, AssertWrongArgumentType
 from fpe.functions import curry, enrichFunction

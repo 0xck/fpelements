@@ -216,6 +216,16 @@ class Function(metaclass=ABCMeta):
 
         return self.__mul__(other)
 
+    def compose(self, other: Callable) -> "FunctionComposition":
+        """Explicit math-style composition method (`*`)."""
+
+        return self._compose(other, self)
+
+    def pipe(self, other: Callable) -> "FunctionComposition":
+        """Explicit pipe-style composition method (`/`)."""
+
+        return self._compose(self, other)
+
     def _copy_meta(self, defaults=("Unknown", None, None, None)):
         # assign some meta
         self.__name__ = "Wrapped: <{}>".format(
@@ -472,6 +482,7 @@ class FunctionComposition(Function):
     """
 
     def __init__(self, func1: Callable, func2: Callable):
+
         # only callable
         assert callable(func1) and callable(func2), AssertNonCallable()
 
