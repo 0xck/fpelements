@@ -3,7 +3,7 @@ os: linux
 dist: xenial
 python:
   - "3.6"
-  - "3.7.2"
+  - "3.8"
 sudo: required
 install:
   - pip install -r requirements/dev.txt
