@@ -10,5 +10,5 @@ from fpe.functions import (compose, curry, enrichFunction, id_, pipe,
                            staticCurry)
 from fpe.itertools import (collect, drop, dropWhile, map_, partition, take,
                            takeWhile, zip_, zipPad, zipWith, zipWithPad)
-from fpe.maybe import Just, Maybe, Nothing, Nothing_, isJust, isNothing
+from fpe.maybe import Just, Maybe, Nothing, isJust, isNothing
 from fpe.seqtools import count, elem, first, foldl, foldl_
