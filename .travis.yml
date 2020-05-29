@@ -6,7 +6,7 @@ python:
   - "3.8"
 sudo: required
 install:
-  - pip install -r requirements/dev.txt
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.8 ]]; then pip install -r requirements/dev-3.8.txt; else pip install -r requirements/dev-3.6.txt; fi
   - pip install -e .
 script:
   - pytest -v --hypothesis-show-statistics --cov=fpe
