@@ -15,14 +15,14 @@ takeWhile.__doc__ = "The same as itertools.takewhile but curried."
 
 @curry
 def take(num: int, iterable: Iterable) -> Union[Iterable, NoReturn]:
-    "Return first num items of the iterable."
+    """Return first num items of the iterable."""
 
     return islice(iterable, num)
 
 
 @curry
 def drop(num: int, iterable: Iterable) -> Union[Iterable, NoReturn]:
-    "Skipping first num items of the iterable and return rest of them."
+    """Skipping first num items of the iterable and return rest of them."""
 
     return islice(iterable, num, None)
 
@@ -97,4 +97,4 @@ def partition(predicate: Callable[..., bool],
     Borrowed from partition :: (a -> Bool) -> [a] -> ([a], [a])
     """
 
-    return (filter(predicate, iterable), filterfalse(predicate, iterable))
+    return filter(predicate, iterable), filterfalse(predicate, iterable)
