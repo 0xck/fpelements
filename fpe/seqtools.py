@@ -1,4 +1,4 @@
-from typing import Any, NoReturn, Union, Callable, Iterable, Container, Collection
+from typing import Any, NoReturn, Union, Callable, Iterable, Container, Collection, Reversible
 from collections.abc import Sequence, Mapping
 from functools import reduce
 
@@ -33,7 +33,7 @@ def first(predicate: Callable[..., bool], iterable: Iterable) -> Union[Maybe, No
     except StopIteration:
         pass
 
-    return Nothing
+    return Nothing()
 
 
 @curry
@@ -56,7 +56,7 @@ def count(item: Any, sequence: Collection) -> Union[int, NoReturn]:
     if isinstance(sequence, Sequence):
         return sequence.count(item)
 
-    count = 0
+    count: int = 0
     for i in sequence:
         if i == item:
             count += 1
@@ -97,7 +97,7 @@ def foldl_(func: Callable, iterable: Iterable) -> Union[Any, NoReturn]:
 
 
 @curry
-def foldr(func: Callable, init: Any, iterable: Iterable) -> Union[Any, NoReturn]:
+def foldr(func: Callable, init: Any, iterable: Reversible) -> Union[Any, NoReturn]:
     """Curried version of functools.reduce with defined initial and reversed sequence.
 
     Apply a function of two arguments cumulatively to the items of a sequence,
@@ -113,7 +113,7 @@ def foldr(func: Callable, init: Any, iterable: Iterable) -> Union[Any, NoReturn]
 
 
 @curry
-def foldr_(func: Callable, iterable: Iterable) -> Union[Any, NoReturn]:
+def foldr_(func: Callable, iterable: Reversible) -> Union[Any, NoReturn]:
     """Curried version of functools.reduce with 1st element as initial and reversed sequence.
 
     Apply a function of two arguments cumulatively to the items of a sequence,
